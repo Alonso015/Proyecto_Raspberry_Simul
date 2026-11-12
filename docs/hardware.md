@@ -18,6 +18,7 @@ Todas son de la asignatura *Sistemas Electrónicos* (ICAI, curso 2025/2026).
 | F4 | Práctica 5 "Conversor A/D y acondicionamiento de sensores" | MCP3008, bloque ANALOG IN, potenciómetro en CH7, límite de corriente GPIO |
 | F5 | Apuntes de la asignatura (`Apuntes_SE_IMAT.pdf`) | BCM2711, PWM hardware → motores, SPI0/SPI1 en la HAT, condensadores antirrebote |
 | F6 | Diapositivas, Tema 4a "Temporizadores y PWM" | Clases `Servo` / `AngularServo`, `pigpio` |
+| F7 | Fotografía de la placa real montada sobre la Pi (aportada por el alumno, 12/11/2026) | Serigrafía: correspondencia de pulsadores y LEDs con sus GPIO, C1–C4, F1, chip montado, zócalo vacío |
 
 **Documento clave aún no disponible:** el esquema de la IMAT HAT, publicado en Moodle (sección de laboratorio, según F2).
 
@@ -132,6 +133,18 @@ Configuraciones:
 | Pulsador | 4 | 7, 16, 17, 19 | Pull-up; activos a nivel bajo. La resistencia de pull-up no se suelda: se usa la interna | Confirmado (F2) |
 | Condensador antirrebote en cada pulsador | 4 | Del pin del pulsador a GND | Filtra rebotes | Confirmado (F5) |
 
+Correspondencia de referencias de la placa con los GPIO (Confirmado, serigrafía en F7):
+
+| Pulsador | GPIO | | LED | GPIO | | LED | GPIO |
+|----------|------|-|-----|------|-|-----|------|
+| SW1 | GPIO7 | | D1 | GPIO20 | | D5 | GPIO24 |
+| SW2 | GPIO16 | | D2 | GPIO21 | | D6 | GPIO25 |
+| SW3 | GPIO17 | | D3 | GPIO22 | | D7 | GPIO26 |
+| SW4 | GPIO19 | | D4 | GPIO23 | | D8 | GPIO27 |
+
+- Cada LED Dn lleva su resistencia Rn (R1–R8).
+- **C1–C4** están junto a los pulsadores. Deducido: son los 4 condensadores antirrebote de F5.
+
 Comportamiento del pulsador (Deducido de "pull-up" y "activo a nivel bajo"):
 
 | Estado | Nivel en el pin | `is_pressed` |
@@ -151,16 +164,17 @@ Comportamiento del pulsador (Deducido de "pull-up" y "activo a nivel bajo"):
 | Canales libres para el usuario | CH0–CH6 |
 | CH7 | Ocupado por el **potenciómetro** de la placa |
 
-Referencias en el render de F1:
+Referencias en la placa:
 
-- **RV1** es el potenciómetro de CH7. Deducido: es el único potenciómetro visible.
-- Qué referencia (¿U1?) corresponde al MCP3008: Pendiente.
+- **RV1** es el potenciómetro de CH7. Deducido: es el único potenciómetro visible (F1, F7).
+- **Encapsulado:** en F7 hay un chip DIP de 16 pines montado junto a RV1, y el zócalo inferior de 2×8 (U2, el del L293D) está vacío. Deducido: el chip montado es el MCP3008 (DIP-16), que se suelda en la primera práctica.
+- Referencia exacta (¿U1?) y texto del chip: Pendiente.
 
 ### 3.4 Control de motores: L293D (Confirmado, F3, F5)
 
 | Dato | Valor |
 |------|-------|
-| Chip | L293D (puente en H doble), insertado en el **zócalo U2** |
+| Chip | L293D (puente en H doble), insertado en el **zócalo U2**. En F7 el zócalo está vacío: se coloca solo cuando hace falta |
 | MOTOR 1: velocidad | PWM hardware canal 0 → **GPIO18** |
 | MOTOR 1: sentido | **GPIO4 y GPIO5**; solo uno a nivel alto a la vez |
 | MOTOR 2: velocidad | PWM hardware canal 1 → **GPIO13** |
@@ -196,15 +210,16 @@ Son relevantes para la validación de conexiones del simulador (Confirmado, F2, 
 
 | Referencia | Qué se ve | Hipótesis (sin confirmar) |
 |------------|-----------|---------------------------|
-| U1 | Integrado SMD | ¿MCP3008? |
-| U3, U4 | Integrados | ¿Regulador de tensión? |
+| U1 | Integrado | ¿MCP3008? (ver §3.3) |
+| U3 (con C9, C10), U4 | Integrados | ¿Regulador de tensión? |
+| F1 | Junto a RV1 (F7) | Por la letra F, probablemente un fusible de protección de la alimentación |
 | Q1 | Componente de 3 terminales | ¿Transistor? |
 | JP1, JP2, JP3 | Jumpers; serigrafía GPIO22, GPIO23 (JP1) y GPIO27 (JP2) | ¿Desconectar LEDs para reutilizar esos GPIO? |
 | J2, J12, P1 y otras tiras de pines | Conectores | ¿Uno de ellos es el DIG (SERVO)? |
 | D9–D16 (cara inferior) | Diodos o LEDs | Desconocido |
 | R10, R11, C5–C10 | Pasivos | Desconocido |
 | Valor de R1–R8 | Resistencias de los LEDs | Desconocido |
-| Correspondencia SWn ↔ GPIO y Dn ↔ GPIO | — | Desconocido |
+| Etiquetas de borneras y bloques (ANALOG IN, DIG (SERVO)) | No se leen en F7 | Desconocido |
 
 ---
 
@@ -230,5 +245,5 @@ Se montan en la protoboard, no en la HAT. Son candidatos a componentes "añadibl
 ## 5. Cómo completar lo pendiente
 
 1. **Esquema de la IMAT HAT de Moodle** (sección de laboratorio de Sistemas Electrónicos). Resuelve casi todo lo de la sección 3.7 y los pines de sentido del MOTOR 2.
-2. **Foto real de la placa montada**: confirma qué bornera es cuál y dónde está DIG (SERVO).
+2. **Fotos cenitales de cerca**: de las borneras y conectores (cuál es MOTOR 1, MOTOR 2, POWER, DIG (SERVO), ANALOG IN) y del texto del chip DIP montado.
 3. **Límite de corriente GPIO**: decidir entre 4 mA y 7 mA para las validaciones del simulador.
