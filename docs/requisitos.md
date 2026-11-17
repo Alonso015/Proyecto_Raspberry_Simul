@@ -197,8 +197,8 @@ Alternativas descartadas:
 |----------|-------------------|--------|
 | Tensión umbral del LED | ~2 V | Valor típico, no medido |
 | Corriente máxima del LED | ~20 mA | Valor típico, no medido |
-| Valor de R1–R8 de la HAT | Valor plausible por determinar | Desconocido hasta tener el esquema |
-| Límite de corriente por GPIO | 4 mA | El más conservador de las dos fuentes (ver hardware.md §1.2) |
+| Valor de R1–R8 de la HAT | **270 Ω** | Ya no es supuesto: confirmado por el esquema (hardware.md §3.2) |
+| Límite de corriente por GPIO | **7 mA** (decidido 17/11/2026) | Valor de las diapositivas (hardware.md §1.2). Se descartan los 4 mA de la práctica 5 porque los LEDs de la HAT consumen ≈ 4,8 mA (hardware.md §3.2). Un único umbral: por encima, el GPIO se daña |
 
 ### 2.7 Representación visual
 
@@ -238,7 +238,7 @@ Condición de diseño: la representación visual queda separada de la lógica (�
 
 | Componente | Motivo para dejarlo fuera del núcleo |
 |------------|--------------------------------------|
-| L293D + motor DC (y GA del PID) | Faltan los pines de sentido del MOTOR 2; coste de tiempo |
+| L293D + motor DC (y GA del PID) | Coste de tiempo. Los pines ya se conocen (hardware.md §3.5) |
 | Buzzer, FSR, sensor IR | Aportan poco nuevo respecto a la LDR |
 | Amplificador operacional MCP6002 | Complica el solver; la LDR se usa con un divisor simple |
 
