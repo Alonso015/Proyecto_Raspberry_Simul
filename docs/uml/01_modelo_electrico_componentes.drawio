@@ -1,0 +1,693 @@
+<mxfile host="Electron" type="device">
+  <diagram id="p1" name="1. Modelo eléctrico">
+    <mxGraphModel grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1880" pageHeight="920" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="p1_title" value="Modelo eléctrico (análisis nodal) — IMAT Pi Simulator · v0.2" vertex="1" parent="1" style="text;html=1;fontSize=18;fontStyle=1;align=left;verticalAlign=middle;">
+          <mxGeometry x="60" y="15" width="1400" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_INonlinearElement" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;INonlinearElement" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="270" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_INonlinearElement_s0" value="+ UpdateRegion(s: ISolution): bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_INonlinearElement">
+          <mxGeometry y="42" width="270" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_IElectricalElement" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IElectricalElement" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="90" width="280" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_IElectricalElement_s0" value="+ Terminals: IReadOnlyList&amp;lt;Terminal&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_IElectricalElement">
+          <mxGeometry y="42" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_IElectricalElement_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p1_IElectricalElement">
+          <mxGeometry y="68" width="280" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_IElectricalElement_s1" value="+ Stamp(ctx: IStampContext): void&lt;br&gt;+ OnSolved(s: ISolution): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_IElectricalElement">
+          <mxGeometry y="76" width="280" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_ISolution" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;ISolution" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="90" width="220" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_ISolution_s0" value="+ VoltageAt(n: Node): double&lt;br&gt;+ PwmAt(n: Node): PwmSignal?" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_ISolution">
+          <mxGeometry y="42" width="220" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_PwmSignal" value="PwmSignal" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="90" width="360" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_PwmSignal_s0" value="+ Frequency: double&lt;br&gt;+ DutyCycle: double&lt;br&gt;+ PulseWidth: double  // = DutyCycle / Frequency" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_PwmSignal">
+          <mxGeometry y="26" width="360" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_Terminal" value="Terminal" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="308" width="130" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_Terminal_s0" value="+ Name: string&lt;br&gt;+ Node: Node" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_Terminal">
+          <mxGeometry y="26" width="130" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_Netlist" value="Netlist" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="308" width="340" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_Netlist_s0" value="+ Nodes: IReadOnlyList&amp;lt;Node&amp;gt;&lt;br&gt;+ Elements: IReadOnlyList&amp;lt;IElectricalElement&amp;gt;&lt;br&gt;+ Ground: Node" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_Netlist">
+          <mxGeometry y="26" width="340" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_NodalSolver" value="NodalSolver" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="308" width="240" height="102" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_NodalSolver_s0" value="- maxIterations: int&lt;br&gt;- gmin: double" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_NodalSolver">
+          <mxGeometry y="26" width="240" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_NodalSolver_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p1_NodalSolver">
+          <mxGeometry y="68" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_NodalSolver_s1" value="+ Solve(n: Netlist): ISolution" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_NodalSolver">
+          <mxGeometry y="76" width="240" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_IStampContext" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IStampContext" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="308" width="390" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_IStampContext_s0" value="+ AddConductance(a: Node, b: Node, g: double): void&lt;br&gt;+ AddCurrentSource(into: Node, i: double): void&lt;br&gt;+ DeclarePwm(n: Node, signal: PwmSignal): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_IStampContext">
+          <mxGeometry y="42" width="390" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_Node" value="Node" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="510" width="360" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_Node_s0" value="+ Index: int&lt;br&gt;+ FixedVoltage: double?  // raíles 3V3, 5V, GND" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_Node">
+          <mxGeometry y="26" width="360" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_NetlistBuilder" value="NetlistBuilder" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="510" width="390" height="102" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_NetlistBuilder_s0" value="- sets: DisjointSet&amp;lt;Terminal&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_NetlistBuilder">
+          <mxGeometry y="26" width="390" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_NetlistBuilder_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p1_NetlistBuilder">
+          <mxGeometry y="52" width="390" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_NetlistBuilder_s1" value="+ Connect(a: Terminal, b: Terminal): void&lt;br&gt;+ Build(e: IEnumerable&amp;lt;IElectricalElement&amp;gt;): Netlist" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_NetlistBuilder">
+          <mxGeometry y="60" width="390" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_MatrixStamper" value="MatrixStamper" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="510" width="410" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_MatrixStamper_s0" value="- g: double[,]&lt;br&gt;- i: double[]&lt;br&gt;- fixed: Dictionary&amp;lt;Node, double&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_MatrixStamper">
+          <mxGeometry y="26" width="410" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_MatrixStamper_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p1_MatrixStamper">
+          <mxGeometry y="84" width="410" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_MatrixStamper_s1" value="+ SolveLinear(): double[]  // Gauss con pivoteo parcial" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_MatrixStamper">
+          <mxGeometry y="92" width="410" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_FaultDetector" value="FaultDetector" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="728" width="420" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_FaultDetector_s0" value="+ Detect(n: Netlist, s: ISolution): IReadOnlyList&amp;lt;Fault&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_FaultDetector">
+          <mxGeometry y="26" width="420" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_IFaultSource" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IFaultSource" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="728" width="360" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_IFaultSource_s0" value="+ CheckFaults(s: ISolution): IEnumerable&amp;lt;Fault&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_IFaultSource">
+          <mxGeometry y="42" width="360" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_Fault" value="Fault" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="728" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_Fault_s0" value="+ Kind: FaultKind&lt;br&gt;+ SourceId: string&lt;br&gt;+ Value: double&lt;br&gt;+ Limit: double" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_Fault">
+          <mxGeometry y="26" width="150" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_FaultKind" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«enumeration»&lt;/span&gt;&lt;br&gt;FaultKind" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="728" width="130" height="132" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_FaultKind_s0" value="LedOvercurrent&lt;br&gt;GpioOvercurrent&lt;br&gt;Overvoltage&lt;br&gt;ShortCircuit&lt;br&gt;PinConflict" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p1_FaultKind">
+          <mxGeometry y="42" width="130" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e0" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.2881;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_INonlinearElement" target="p1_IElectricalElement">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e1" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0.2000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_IElectricalElement" target="p1_Terminal">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="636" y="258" />
+              <mxPoint x="125" y="258" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1_e1_m" value="1..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p1_e1">
+          <mxGeometry x="0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1_e2" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.1806;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_Terminal" target="p1_Node">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e2_m" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p1_e2">
+          <mxGeometry x="0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1_e3" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.8000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_Node" target="p1_Netlist">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="530" y="544" />
+              <mxPoint x="530" y="375" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1_e3_m" value="1..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p1_e3">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1_e4" value="" style="endArrow=diamondThin;endFill=0;endSize=24;html=1;rounded=0;exitX=0.6000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.4941;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_IElectricalElement" target="p1_Netlist">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e4_m" value="*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p1_e4">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1_e5" value="«usa»" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=0.0000;exitY=0.4118;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1.0000;entryY=0.5000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_NodalSolver" target="p1_Netlist">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e6" value="«devuelve»" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=0.4583;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_NodalSolver" target="p1_ISolution">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e7" value="«crea»" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.5000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_NodalSolver" target="p1_MatrixStamper">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1190" y="569" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1_e8" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.4756;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_MatrixStamper" target="p1_IStampContext">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e9" value="" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=0.4615;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_IStampContext" target="p1_PwmSignal">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e10" value="" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.5000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_ISolution" target="p1_PwmSignal">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e11" value="«crea»" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=0.4359;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_NetlistBuilder" target="p1_Netlist">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e12" value="«consulta»" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.3824;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_FaultDetector" target="p1_IFaultSource">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e13" value="«produce»" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.3400;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_IFaultSource" target="p1_Fault">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e14" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.3788;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p1_Fault" target="p1_FaultKind">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e14_m" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p1_e14">
+          <mxGeometry x="0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="p2" name="2. Componentes: núcleo">
+    <mxGraphModel grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2030" pageHeight="1106" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="p2_title" value="Componentes: núcleo (Composite, Flyweight, Factory) — IMAT Pi Simulator · v0.2" vertex="1" parent="1" style="text;html=1;fontSize=18;fontStyle=1;align=left;verticalAlign=middle;">
+          <mxGeometry x="60" y="15" width="1400" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_note0" value="Las clases con borde discontinuo son referencias a clases detalladas en otra página." vertex="1" parent="1" style="text;html=1;fontSize=11;fontStyle=2;align=left;verticalAlign=middle;">
+          <mxGeometry x="60" y="45" width="1400" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_ComponentType" value="ComponentType" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="100" width="420" height="116" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_ComponentType_s0" value="+ Id: string&lt;br&gt;+ DisplayName: string&lt;br&gt;+ PinLayout: IReadOnlyList&amp;lt;PinSpec&amp;gt;&lt;br&gt;+ DefaultParameters: IReadOnlyDictionary&amp;lt;string, double&amp;gt;&lt;br&gt;+ SpriteKey: string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_ComponentType">
+          <mxGeometry y="26" width="420" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_ComponentFactory" value="ComponentFactory" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="570" y="100" width="520" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_ComponentFactory_s0" value="- types: Dictionary&amp;lt;string, ComponentType&amp;gt;&lt;br&gt;- creators: Dictionary&amp;lt;string, Func&amp;lt;ComponentType, string, Component&amp;gt;&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_ComponentFactory">
+          <mxGeometry y="26" width="520" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_ComponentFactory_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p2_ComponentFactory">
+          <mxGeometry y="68" width="520" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_ComponentFactory_s1" value="+ Register(t: ComponentType, creator): void&lt;br&gt;+ Create(typeId: string, id: string): Component" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_ComponentFactory">
+          <mxGeometry y="76" width="520" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_IComponentFactory" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IComponentFactory" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="100" width="360" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_IComponentFactory_s0" value="+ Create(typeId: string, id: string): Component" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_IComponentFactory">
+          <mxGeometry y="42" width="360" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Pin" value="Pin" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1630" y="100" width="170" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Pin_s0" value="+ Name: string&lt;br&gt;+ Owner: Component&lt;br&gt;+ Terminal: Terminal" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_Pin">
+          <mxGeometry y="26" width="170" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Terminal" value="Terminal" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="100" width="80" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_CompositeComponent" value="CompositeComponent" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="328" width="410" height="134" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_CompositeComponent_s0" value="- children: List&amp;lt;Component&amp;gt;&lt;br&gt;- internalLinks: List&amp;lt;(Terminal, Terminal)&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_CompositeComponent">
+          <mxGeometry y="26" width="410" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_CompositeComponent_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p2_CompositeComponent">
+          <mxGeometry y="68" width="410" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_CompositeComponent_s1" value="+ Add(c: Component): void&lt;br&gt;+ Link(a: Terminal, b: Terminal): void&lt;br&gt;+ ElectricalElements(): IEnumerable&amp;lt;IElectricalElement&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_CompositeComponent">
+          <mxGeometry y="76" width="410" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Component" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«abstract»&lt;/span&gt;&lt;br&gt;&lt;i&gt;Component&lt;/i&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="328" width="690" height="182" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Component_s0" value="+ Id: string&lt;br&gt;+ Type: ComponentType&lt;br&gt;+ Pins: IReadOnlyList&amp;lt;Pin&amp;gt;&lt;br&gt;+ event StateChanged: Action&amp;lt;Component&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_Component">
+          <mxGeometry y="42" width="690" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Component_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p2_Component">
+          <mxGeometry y="116" width="690" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Component_s1" value="+ ElectricalElements(): IEnumerable&amp;lt;IElectricalElement&amp;gt; {abstract}&lt;br&gt;+ InternalLinks(): IEnumerable&amp;lt;(Terminal, Terminal)&amp;gt;&lt;br&gt;+ Reset(): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_Component">
+          <mxGeometry y="124" width="690" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_IBehavioralComponent" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IBehavioralComponent" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1630" y="328" width="310" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_IBehavioralComponent_s0" value="+ Update(dt: double, s: ISolution): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_IBehavioralComponent">
+          <mxGeometry y="42" width="310" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Led" value="Led" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="660" width="200" height="132" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Led_s0" value="+ ForwardVoltage: double&lt;br&gt;+ MaxCurrent: double&lt;br&gt;+ Current: double&lt;br&gt;+ Brightness: double&lt;br&gt;+ IsBurnt: bool&lt;br&gt;- conducting: bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_Led">
+          <mxGeometry y="26" width="200" height="106" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Resistor" value="Resistor" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="660" width="170" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Resistor_s0" value="+ Resistance: double" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_Resistor">
+          <mxGeometry y="26" width="170" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_PushButton" value="PushButton" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="660" width="150" height="102" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_PushButton_s0" value="+ IsPressed: bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_PushButton">
+          <mxGeometry y="26" width="150" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_PushButton_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p2_PushButton">
+          <mxGeometry y="52" width="150" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_PushButton_s1" value="+ Press(): void&lt;br&gt;+ Release(): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_PushButton">
+          <mxGeometry y="60" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Potentiometer" value="Potentiometer" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="660" width="220" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Potentiometer_s0" value="+ TotalResistance: double&lt;br&gt;+ Position: double  // 0..1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_Potentiometer">
+          <mxGeometry y="26" width="220" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Ldr" value="Ldr" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="660" width="270" height="102" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Ldr_s0" value="+ Illuminance: double  // lx&lt;br&gt;- curve: (double lx, double ohm)[]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_Ldr">
+          <mxGeometry y="26" width="270" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Ldr_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p2_Ldr">
+          <mxGeometry y="68" width="270" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_Ldr_s1" value="+ Resistance(): double" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p2_Ldr">
+          <mxGeometry y="76" width="270" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_r_INonlinear" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;INonlinearElement" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="902" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_r_IFaultSource" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IFaultSource" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1004" width="110" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_r_IElectrical" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IElectricalElement" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="565" y="902" width="365" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e0" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=1.0000;exitY=0.2881;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.5000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_ComponentFactory" target="p2_IComponentFactory">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e1" value="" style="endArrow=diamondThin;endFill=0;endSize=24;html=1;rounded=0;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.4915;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_ComponentType" target="p2_ComponentFactory">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e1_m" value="*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p2_e1">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e2" value="«crea»" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.3913;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_ComponentFactory" target="p2_Component">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e3" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0.0290;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Component" target="p2_ComponentType">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="273" />
+              <mxPoint x="270" y="273" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e3_m" value="1 (compartido)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p2_e3">
+          <mxGeometry x="0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e4" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.9710;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Pin" target="p2_Component">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1715" y="273" />
+              <mxPoint x="1230" y="273" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e4_m" value="1..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p2_e4">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e5" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=1.0000;exitY=0.1548;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.5000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Pin" target="p2_Terminal">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e5_m" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p2_e5">
+          <mxGeometry x="0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e6" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=1.0000;exitY=0.3000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0000;entryY=0.2209;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_CompositeComponent" target="p2_Component">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e7" value="" style="endArrow=diamondThin;endFill=0;endSize=24;html=1;rounded=0;exitX=0.0000;exitY=0.5154;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1.0000;entryY=0.7000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Component" target="p2_CompositeComponent">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e7_m" value="0..* hijos" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p2_e7">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e8" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0942;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_PushButton" target="p2_Component">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e9" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.4493;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Potentiometer" target="p2_Component">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e10" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.8913;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Ldr" target="p2_Component">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e11" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0314;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Led" target="p2_Component">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="560" />
+              <mxPoint x="582" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e12" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0628;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Resistor" target="p2_Component">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="405" y="610" />
+              <mxPoint x="603" y="610" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e13" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.1500;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.2000;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Led" target="p2_r_INonlinear">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e14" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.9000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.1818;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Led" target="p2_r_IFaultSource">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e15" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.1644;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_PushButton" target="p2_r_IElectrical">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e16" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.8356;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Potentiometer" target="p2_r_IElectrical">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_e17" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.0822;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Resistor" target="p2_r_IElectrical">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="405" y="832" />
+              <mxPoint x="595" y="832" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2_e18" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.9178;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p2_Ldr" target="p2_r_IElectrical">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1175" y="832" />
+              <mxPoint x="900" y="832" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="p3" name="3. Componentes: Pi e IMAT HAT">
+    <mxGraphModel grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2640" pageHeight="1030" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="p3_title" value="Componentes: Raspberry Pi e IMAT HAT — IMAT Pi Simulator · v0.2" vertex="1" parent="1" style="text;html=1;fontSize=18;fontStyle=1;align=left;verticalAlign=middle;">
+          <mxGeometry x="60" y="15" width="1400" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_note0" value="Las clases con borde discontinuo son referencias a clases detalladas en otra página." vertex="1" parent="1" style="text;html=1;fontSize=11;fontStyle=2;align=left;verticalAlign=middle;">
+          <mxGeometry x="60" y="45" width="1400" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_RaspberryPi" value="RaspberryPi" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="242" width="460" height="182" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_RaspberryPi_s0" value="- gpio: GpioPin[28]  // BCM 0..27&lt;br&gt;+ Rail3V3: Pin&lt;br&gt;+ Rail5V: Pin&lt;br&gt;+ Ground: Pin&lt;br&gt;+ SpiEnabled: bool&lt;br&gt;+ HardwarePwmEnabled: bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_RaspberryPi">
+          <mxGeometry y="26" width="460" height="106" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_RaspberryPi_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p3_RaspberryPi">
+          <mxGeometry y="132" width="460" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_RaspberryPi_s1" value="+ Gpio(bcm: int): GpioPin&lt;br&gt;+ CheckFaults(s: ISolution): IEnumerable&amp;lt;Fault&amp;gt;  // conflictos" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_RaspberryPi">
+          <mxGeometry y="140" width="460" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_ImatHat" value="ImatHat" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="920" y="242" width="450" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_ImatHat_s0" value="+ Leds: Led[8]  // D1..D8 → GPIO20..27&lt;br&gt;+ LedResistors: Resistor[8]  // R1..R8&lt;br&gt;+ Buttons: PushButton[4]  // SW1..SW4 → GPIO7, 16, 17, 19&lt;br&gt;+ Potentiometer: Potentiometer  // RV1 → CH7&lt;br&gt;+ Adc: Mcp3008" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_ImatHat">
+          <mxGeometry y="26" width="450" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_ImatHat_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p3_ImatHat">
+          <mxGeometry y="116" width="450" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_ImatHat_s1" value="+ ImatHat(pi: RaspberryPi)  // crea hijos y enlaces internos" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_ImatHat">
+          <mxGeometry y="124" width="450" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_Mcp3008" value="Mcp3008" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1530" y="242" width="510" height="134" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_Mcp3008_s0" value="+ Vref: double = 3.3&lt;br&gt;- codes: int[8]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_Mcp3008">
+          <mxGeometry y="26" width="510" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_Mcp3008_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p3_Mcp3008">
+          <mxGeometry y="68" width="510" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_Mcp3008_s1" value="+ Read(channel: int): int  // 0..1023&lt;br&gt;+ Update(dt: double, s: ISolution): void&lt;br&gt;+ CheckFaults(s: ISolution): IEnumerable&amp;lt;Fault&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_Mcp3008">
+          <mxGeometry y="76" width="510" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_Servo" value="Servo" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2200" y="242" width="380" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_Servo_s0" value="+ Angle: double&lt;br&gt;+ TargetAngle: double&lt;br&gt;+ MinPulse: double = 0.5 ms  // 0°&lt;br&gt;+ MaxPulse: double = 2.5 ms  // 180°&lt;br&gt;+ MaxSpeed: double  // °/s (supuesto)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_Servo">
+          <mxGeometry y="26" width="380" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_Servo_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p3_Servo">
+          <mxGeometry y="116" width="380" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_Servo_s1" value="+ Update(dt: double, s: ISolution): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_Servo">
+          <mxGeometry y="124" width="380" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_GpioPin" value="GpioPin" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="524" width="460" height="246" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_GpioPin_s0" value="+ Bcm: int&lt;br&gt;+ Mode: PinMode&lt;br&gt;+ Pull: PullMode&lt;br&gt;+ OutputLevel: bool&lt;br&gt;+ Pwm: PwmSignal?&lt;br&gt;+ Current: double&lt;br&gt;- rInternal: double  // supuesto&lt;br&gt;- currentLimit: double = 7 mA&lt;br&gt;- vHighThreshold: double  // supuesto" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_GpioPin">
+          <mxGeometry y="26" width="460" height="154" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_GpioPin_l1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="p3_GpioPin">
+          <mxGeometry y="180" width="460" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_GpioPin_s1" value="+ ReadLevel(): bool  // tensión del tick anterior&lt;br&gt;+ Stamp(ctx: IStampContext): void&lt;br&gt;+ CheckFaults(s: ISolution): IEnumerable&amp;lt;Fault&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_GpioPin">
+          <mxGeometry y="188" width="460" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_PinMode" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«enumeration»&lt;/span&gt;&lt;br&gt;PinMode" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="870" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_PinMode_s0" value="Input&lt;br&gt;Output&lt;br&gt;Pwm" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_PinMode">
+          <mxGeometry y="42" width="120" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_PullMode" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«enumeration»&lt;/span&gt;&lt;br&gt;PullMode" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="870" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_PullMode_s0" value="None&lt;br&gt;Up&lt;br&gt;Down" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="p3_PullMode">
+          <mxGeometry y="42" width="120" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_rc_pi" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«abstract»&lt;/span&gt;&lt;br&gt;&lt;i&gt;Component&lt;/i&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="100" width="100" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_rcc_hat" value="CompositeComponent" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="100" width="150" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_rc_adc" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«abstract»&lt;/span&gt;&lt;br&gt;&lt;i&gt;Component&lt;/i&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1735" y="100" width="100" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_rc_servo" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«abstract»&lt;/span&gt;&lt;br&gt;&lt;i&gt;Component&lt;/i&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="2340" y="100" width="100" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_rf_pi" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IFaultSource" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="272" width="110" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_re_gpio" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IElectricalElement" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="554" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_rf_gpio" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IFaultSource" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="636" width="110" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_k_led" value="Led" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="940" y="524" width="50" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_k_res" value="Resistor" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="524" width="80" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_k_btn" value="PushButton" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="524" width="100" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_k_pot" value="Potentiometer" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="524" width="120" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_re_adc" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IElectricalElement" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1550" y="524" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_rb_adc" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IBehavioralComponent" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1720" y="524" width="170" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_rf_adc" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IFaultSource" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1910" y="524" width="110" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_re_servo" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IElectricalElement" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="2220" y="524" width="150" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_rb_servo" value="&lt;span style=&quot;font-weight:normal&quot;&gt;«interface»&lt;/span&gt;&lt;br&gt;IBehavioralComponent" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=42;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="2390" y="524" width="170" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e0" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_RaspberryPi" target="p3_rc_pi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e1" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.0000;exitY=0.2802;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1.0000;entryY=0.5000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_RaspberryPi" target="p3_rf_pi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e2" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_GpioPin" target="p3_RaspberryPi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e2_m" value="28" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p3_e2">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_e3" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.0000;exitY=0.2073;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1.0000;entryY=0.5000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_GpioPin" target="p3_re_gpio">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e4" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.0000;exitY=0.5407;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1.0000;entryY=0.5000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_GpioPin" target="p3_rf_gpio">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e5" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0.1739;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_GpioPin" target="p3_PinMode">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e5_m" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p3_e5">
+          <mxGeometry x="0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_e6" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0.5217;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_GpioPin" target="p3_PullMode">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e6_m" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p3_e6">
+          <mxGeometry x="0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_e7" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_ImatHat" target="p3_rcc_hat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e8" value="se monta sobre" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0.0000;exitY=0.5000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1.0000;entryY=0.4121;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_ImatHat" target="p3_RaspberryPi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e8_m" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p3_e8">
+          <mxGeometry x="0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_e9" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.1000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_k_led" target="p3_ImatHat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e9_m" value="8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p3_e9">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_e10" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.2889;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_k_res" target="p3_ImatHat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e10_m" value="8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p3_e10">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_e11" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5333;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_k_btn" target="p3_ImatHat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e11_m" value="4" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p3_e11">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_e12" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.8222;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_k_pot" target="p3_ImatHat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e12_m" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p3_e12">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_e13" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=0.0000;exitY=0.5000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1.0000;entryY=0.4467;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_Mcp3008" target="p3_ImatHat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e13_m" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="p3_e13">
+          <mxGeometry x="-0.75" y="-10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_e14" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_Mcp3008" target="p3_rc_adc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e15" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.1863;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_Mcp3008" target="p3_re_adc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e16" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5392;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_Mcp3008" target="p3_rb_adc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e17" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.8529;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_Mcp3008" target="p3_rf_adc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e18" value="" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_Servo" target="p3_rc_servo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e19" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.2500;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_Servo" target="p3_re_servo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_e20" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.7237;exitY=1.0000;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="p3_Servo" target="p3_rb_servo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
