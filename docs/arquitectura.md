@@ -268,6 +268,17 @@ Implementado en `Assets/Scripts/Domain/Electrical` y `Components/Resistor.cs`, c
 
 Los valores numéricos son supuestos y están en requisitos.md §2.6.
 
+**Etapa E3 (18/11/2026):** `Led`, iteración del solver y fallos.
+
+| Cambio | Detalle |
+|--------|---------|
+| `INonlinearElement.UpdateRegion` | El solver resuelve, pregunta a cada elemento no lineal si su región supuesta (conduce / no conduce) es coherente y, si alguno cambia, vuelve a resolver. Máximo de 50 iteraciones. Lo habitual son 2 |
+| `Led` | Lineal a trozos: corte = abierto; conducción = Norton de V_F en serie con R_S. Si supera I_máx queda quemado (abierto) hasta `Reset()` |
+| `IFaultSource.CheckFaults()` sin parámetro | Se aparta del diagrama v0.2: cada elemento ya guarda su estado al recibir la solución |
+| Fallos persistentes | Un LED quemado o un GPIO dañado siguen así en las resoluciones siguientes, como en la placa real. Se reponen con `Reset()` al reintentar el reto |
+| `FaultDetector` estático | Junta los cortocircuitos de la netlist (sin resolver) con los fallos de los elementos. Cada fallo trae un mensaje en castellano para el jugador |
+| `FaultKind.PinConflict` | Todavía no existe; llega en E5 |
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |

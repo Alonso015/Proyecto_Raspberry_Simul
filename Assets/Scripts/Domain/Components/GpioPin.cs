@@ -40,7 +40,7 @@ namespace ImatPiSim.Domain.Components
     /// <para>Los valores por defecto son <b>supuestos de la simulación</b> (no aparecen en las
     /// fuentes del proyecto); ver docs/requisitos.md §2.6.</para>
     /// </remarks>
-    public sealed class GpioPin : IElectricalElement
+    public sealed class GpioPin : IElectricalElement, IFaultSource
     {
         public const double SupplyVoltage = 3.3;
 
@@ -55,6 +55,18 @@ namespace ImatPiSim.Domain.Components
 
         /// <summary>Supuesto: por encima de esta tensión la entrada se lee HIGH (V).</summary>
         public const double DefaultInputHighMin = 2.0;
+
+        /// <summary>
+        /// Límite de corriente por pin (A). Decidido el 17/11/2026 a partir de las diapositivas
+        /// (docs/hardware.md §1.2): por encima, el GPIO se daña.
+        /// </summary>
+        public const double MaxCurrent = 0.007;
+
+        /// <summary>
+        /// Tensión máxima admisible en el pin (V). La lógica es de 3,3 V; el margen de 0,1 V es
+        /// un supuesto para no confundir el redondeo numérico con un fallo.
+        /// </summary>
+        public const double MaxVoltage = SupplyVoltage + 0.1;
 
         private readonly Terminal[] _terminals;
         private bool _lastReadLevel;
@@ -102,6 +114,11 @@ namespace ImatPiSim.Domain.Components
         /// Corriente que <b>sale</b> del pin hacia el circuito (A). Negativa si el pin la absorbe.
         /// </summary>
         public double Current { get; private set; }
+
+        /// <summary>El pin se ha dañado por sobrecorriente o sobretensión (hasta <see cref="Reset"/>).</summary>
+        public bool IsDamaged => _faults.Count > 0;
+
+        private readonly List<Fault> _faults = new List<Fault>();
 
         /// <summary>Lectura lógica de la tensión del pin en la última resolución.</summary>
         public InputLevel Level { get; private set; } = InputLevel.Low;
@@ -167,6 +184,27 @@ namespace ImatPiSim.Domain.Components
             Level = Voltage <= InputLowMax ? InputLevel.Low
                   : Voltage >= InputHighMin ? InputLevel.High
                   : InputLevel.Undefined;
+
+            // Un daño no se "cura" solo: se registra la primera vez que ocurre cada tipo.
+            if (Math.Abs(Current) > MaxCurrent && !_faults.Exists(f => f.Kind == FaultKind.GpioOvercurrent))
+                _faults.Add(new Fault(FaultKind.GpioOvercurrent, "GPIO" + Bcm, Math.Abs(Current), MaxCurrent, "A"));
+            if (Voltage > MaxVoltage && !_faults.Exists(f => f.Kind == FaultKind.Overvoltage))
+                _faults.Add(new Fault(FaultKind.Overvoltage, "GPIO" + Bcm, Voltage, SupplyVoltage, "V"));
+        }
+
+        public IEnumerable<Fault> CheckFaults() => _faults;
+
+        /// <summary>Repone el pin: entrada sin pull y sin daños (nuevo intento del reto).</summary>
+        public void Reset()
+        {
+            _faults.Clear();
+            Mode = PinMode.Input;
+            Pull = PullMode.None;
+            OutputLevel = false;
+            Voltage = 0;
+            Current = 0;
+            Level = InputLevel.Low;
+            _lastReadLevel = false;
         }
 
         public override string ToString() => $"GPIO{Bcm} ({Mode}{(Mode == PinMode.Input ? ", pull " + Pull : "")})";

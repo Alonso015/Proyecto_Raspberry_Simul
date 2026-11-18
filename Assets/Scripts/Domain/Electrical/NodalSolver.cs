@@ -8,8 +8,9 @@ namespace ImatPiSim.Domain.Electrical
     /// </summary>
     /// <remarks>
     /// Pasos: (1) cada elemento estampa su contribución; (2) se añade gmin; (3) se resuelve
-    /// G·V = I; (4) cada elemento recibe la solución en <see cref="IElectricalElement.OnSolved"/>.
-    /// En esta etapa solo hay elementos lineales; los diodos (iteración) llegan en la etapa 3.
+    /// G·V = I; (4) si hay elementos no lineales (<see cref="INonlinearElement"/>), se comprueba
+    /// que su región sea coherente y, si no, se repite; (5) cada elemento recibe la solución
+    /// definitiva en <see cref="IElectricalElement.OnSolved"/>.
     /// </remarks>
     public sealed class NodalSolver
     {
@@ -38,6 +39,35 @@ namespace ImatPiSim.Domain.Electrical
                 throw new InvalidOperationException(
                     "No se puede resolver un circuito con cortocircuito entre raíles: " + netlist.ShortCircuits[0]);
 
+            var nonlinear = new List<INonlinearElement>();
+            foreach (var e in netlist.Elements)
+                if (e is INonlinearElement nl) nonlinear.Add(nl);
+
+            for (int iteration = 1; iteration <= MaxIterations; iteration++)
+            {
+                var solution = SolveOnce(netlist);
+                LastIterations = iteration;
+
+                // ¿Eran coherentes las regiones supuestas (conduce / no conduce)?
+                bool changed = false;
+                foreach (var nl in nonlinear) changed |= nl.UpdateRegion(solution);
+                if (changed) continue;
+
+                foreach (var e in netlist.Elements) e.OnSolved(solution);
+                return solution;
+            }
+            throw new InvalidOperationException(
+                $"El circuito no converge en {MaxIterations} iteraciones: algún elemento no lineal oscila entre regiones.");
+        }
+
+        /// <summary>Máximo de resoluciones para que los elementos no lineales sean coherentes.</summary>
+        public int MaxIterations { get; set; } = 50;
+
+        /// <summary>Resoluciones lineales que necesitó la última llamada a <see cref="Solve"/>.</summary>
+        public int LastIterations { get; private set; }
+
+        private NodalSolution SolveOnce(Netlist netlist)
+        {
             var stamper = new MatrixStamper(netlist);
             foreach (var e in netlist.Elements) e.Stamp(stamper);
             stamper.AddGmin(Gmin);
@@ -48,10 +78,7 @@ namespace ImatPiSim.Domain.Electrical
             foreach (var n in netlist.Nodes)
                 if (n.IsFixed) voltages[n] = n.FixedVoltage.Value;
             for (int k = 0; k < x.Length; k++) voltages[stamper.Unknowns[k]] = x[k];
-
-            var solution = new NodalSolution(voltages);
-            foreach (var e in netlist.Elements) e.OnSolved(solution);
-            return solution;
+            return new NodalSolution(voltages);
         }
 
         private sealed class NodalSolution : ISolution

@@ -22,6 +22,23 @@ namespace ImatPiSim.Domain.Electrical
     }
 
     /// <summary>
+    /// Elemento cuyo modelo depende del punto de trabajo (p. ej. un diodo, que conduce o no
+    /// según la tensión). Se modela como lineal a trozos: en cada "región" es lineal.
+    /// </summary>
+    /// <remarks>
+    /// El solver supone una región para cada elemento, resuelve y pregunta si la suposición
+    /// era coherente. Si alguno cambia de región, vuelve a estampar y resolver.
+    /// </remarks>
+    public interface INonlinearElement : IElectricalElement
+    {
+        /// <summary>
+        /// Comprueba la región supuesta frente a la solución y la corrige si hace falta.
+        /// </summary>
+        /// <returns><c>true</c> si ha cambiado de región (hay que volver a resolver).</returns>
+        bool UpdateRegion(ISolution solution);
+    }
+
+    /// <summary>
     /// Lo que un elemento puede escribir en el sistema de ecuaciones nodales.
     /// </summary>
     public interface IStampContext

@@ -158,7 +158,7 @@ GPIO ── Rn (270 Ω) ── ánodo Dn ── cátodo ── JP1 o JP2 ── 
 
 I ≈ (3,3 − 2) / 270 ≈ **4,8 mA**
 
-Esto es **más que los 4 mA** que F4 da como límite del GPIO, y menos que los 7 mA de F1. Como la propia placa trabaja así, los 4 mA deben entenderse como una recomendación conservadora, no como el umbral a partir del cual el pin se daña. Por eso el simulador usa 7 mA (§1.2).
+Con los supuestos del simulador (resistencia de salida del GPIO 40 Ω, LED con V_F = 2 V y R_S = 10 Ω) sale (3,3 − 2) / (40 + 270 + 10) ≈ **4,06 mA** (test T1 de la E3). En ambos casos es **más que los 4 mA** que F4 da como límite del GPIO, y menos que los 7 mA de F1. Como la propia placa trabaja así, los 4 mA deben entenderse como una recomendación conservadora, no como el umbral a partir del cual el pin se daña. Por eso el simulador usa 7 mA (§1.2).
 
 ### 3.3 Pulsadores (Confirmado, F8; coincide con F2, F5 y F7)
 

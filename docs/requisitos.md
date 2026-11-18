@@ -203,6 +203,8 @@ Alternativas descartadas:
 | Pull-up / pull-down interna | 50 kΩ (E2, aceptado el 18/11/2026) | No está en las fuentes. Solo importa que sea mucho mayor que el contacto de un pulsador y mucho menor que la impedancia de entrada |
 | Umbrales de lectura de una entrada | LOW ≤ 0,8 V; HIGH ≥ 2,0 V; entre ambos, *indefinido* (E2, aceptado el 18/11/2026) | No está en las fuentes. Valores típicos de lógica de 3,3 V. En la zona indefinida se mantiene la última lectura (aproxima la histéresis) |
 | Resistencia del contacto de un pulsador | 0,1 Ω (E2, aceptado el 18/11/2026) | No está en las fuentes. Pulsador suelto = circuito abierto ideal; sin rebotes |
+| Resistencia serie del LED en conducción | 10 Ω (E3, aceptado el 18/11/2026) | No está en las fuentes. Modelo lineal a trozos: V_F + R_S; valor típico de un LED de 5 mm |
+| Margen de sobretensión en un GPIO | 3,3 V + 0,1 V (E3, aceptado el 18/11/2026) | Las fuentes dicen que más de 3,3 V daña la Pi. El margen evita confundir el redondeo numérico con un fallo |
 
 ### 2.7 Representación visual
 
