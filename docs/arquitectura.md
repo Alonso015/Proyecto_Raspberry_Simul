@@ -307,6 +307,18 @@ Los valores numéricos son supuestos y están en requisitos.md §2.6.
 | `Mcp3008` | Cuantización de 10 bits; `Read`, `ReadValue` (/1023) y `ReadVoltage` como en gpiozero. Solo se puede leer con el SPI activado. Sobretensión por canal |
 | `RaspberryPi.SpiEnabled` y conflictos | Con SPI0 activo, usar GPIO7–11 como GPIO es `PinConflict`. `FaultDetector.Detect(netlist, pi)` acepta fuentes de fallo que no son elementos del circuito |
 
+**Etapa E6 (18/11/2026):** analizador léxico, en `Assets/Scripts/Domain/Interpreter/`.
+
+| Pieza | Detalle |
+|-------|---------|
+| `Token` / `TokenType` | Clase de token, texto original, valor (`long`, `double` o `string`) y posición (línea y columna desde 1) |
+| `Lexer.Tokenize(texto)` | Devuelve la lista de tokens terminada en `EndOfFile`. Lanza `LexerException` con línea, columna y mensaje en castellano |
+| Sangría | Pila de niveles: más sangría da `Indent`; menos, un `Dedent` por cada nivel cerrado, y tiene que coincidir con un nivel anterior. Tabulador = hasta el siguiente múltiplo de 8. Las líneas en blanco o solo con comentario no cuentan |
+| Líneas lógicas | Dentro de `()`, `[]` y `{}` los saltos no terminan la sentencia; tampoco `\` al final de línea |
+| Números | Decimales, `0x`, `0b`, `0o`, `_` entre dígitos (`20_000`), decimales con exponente. Se rechazan los ceros a la izquierda |
+| Cadenas | Comillas simples o dobles, triples (varias líneas), escapes básicos y `r'...'`. Las f-strings y los bytes dan un error claro |
+| Palabras clave fuera del subconjunto | `try`, `class`, `with`… se reconocen como palabras clave para que el parser dé un error explicativo en vez de "nombre desconocido" |
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |
