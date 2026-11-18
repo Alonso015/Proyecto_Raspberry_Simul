@@ -241,3 +241,41 @@ Se cerrará al diseñar el motor de simulación.
 |----------|----------|----------|
 | Cómo pausar y reanudar el programa del jugador (cooperativo) | (a) Evaluador del AST con iteradores de C# (`IEnumerator`, como las corrutinas de Unity); (b) compilar el AST a bytecode para una pequeña máquina de pila | Diagrama de clases del intérprete |
 | Datos de los retos | `ScriptableObject` editables en Unity, o archivos JSON | Retos, Factory |
+
+## 8. Estructura del repositorio y pruebas
+
+Implantado en la etapa E0.2, el 18/11/2026, con **Unity 6000.0.85f2**.
+
+```
+Assets/
+  Scripts/Domain/          ← dominio en C# puro (ImatPiSim.Domain.asmdef, noEngineReferences = true)
+  Tests/EditMode/          ← tests NUnit del dominio (ImatPiSim.Domain.Tests.asmdef, solo Editor)
+Packages/                  ← manifest de paquetes de Unity
+ProjectSettings/           ← configuración del proyecto (modo 2D por defecto)
+tools/DomainTests/         ← proyectos dotnet para ejecutar los mismos tests sin abrir Unity
+  Domain/ImatPiSim.Domain.csproj       compila Assets/Scripts/Domain con .NET Standard 2.1 y C# 9
+  ImatPiSim.Domain.Tests.csproj        compila Assets/Tests/EditMode con NUnit 3 (net10.0)
+docs/                      ← documentación y UML
+```
+
+**Ensamblado del dominio (`noEngineReferences = true`):** Unity no le deja usar `UnityEngine`. Si alguien escribe `using UnityEngine;` en el dominio, deja de compilar. La regla del §1 la comprueba el compilador.
+
+**Restricciones del lenguaje:** el proyecto dotnet del dominio usa .NET Standard 2.1 y C# 9, lo mismo que admite Unity 6. Si se usa una característica más moderna (por ejemplo, `namespace X;` en una línea, que es de C# 10), falla al compilar aquí.
+
+**Paquetes añadidos:**
+
+| Paquete | Versión | Para qué |
+|---------|---------|----------|
+| `com.unity.2d.sprite` | 1.0.0 | Sprites 2D |
+| `com.unity.test-framework` | 1.6.0 | Test Runner y NUnit |
+| `com.unity.ugui` | 2.0.0 | UI, con TextMeshPro incluido en Unity 6 |
+
+Paquetes candidatos para más adelante, si hacen falta: URP 2D, para la iluminación de la etapa de pulido.
+
+**Cómo ejecutar los tests:**
+
+| Dónde | Cómo |
+|-------|------|
+| Fuera de Unity | `dotnet test tools/DomainTests` |
+| En el editor | *Window → General → Test Runner → EditMode → Run All* |
+| Unity sin interfaz | `Unity.exe -batchmode -nographics -projectPath . -runTests -testPlatform EditMode -testResults <ruta>.xml` |

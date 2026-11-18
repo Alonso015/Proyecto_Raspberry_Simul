@@ -4,3 +4,59 @@ CLAUDE.local.md
 # Material de la asignatura (no redistribuir)
 IMAT_ProyectoFinal*.pdf
 Esquema de la tarjeta de expansi*.pdf
+
+# ---------------------------------------------------------------- Unity
+# Carpetas generadas por Unity (también son las que el enunciado pide borrar del .zip)
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Archivos de solución y proyecto que genera el IDE
+.vs/
+.vscode/
+.idea/
+.gradle/
+*.csproj
+!tools/**/*.csproj
+*.unityproj
+*.sln
+!tools/**/*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Informes de fallos y resultados de tests
+sysinfo.txt
+crashlytics-build.properties
+TestResults*.xml
+
+# Builds
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Carpetas que Unity genera al importar ciertos paquetes
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# ---------------------------------------------------------------- dotnet (tools/)
+tools/**/bin/
+tools/**/obj/
