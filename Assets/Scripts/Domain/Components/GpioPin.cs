@@ -4,11 +4,13 @@ using ImatPiSim.Domain.Electrical;
 
 namespace ImatPiSim.Domain.Components
 {
-    /// <summary>Configuración de un pin GPIO. PWM llegará en la etapa E5.</summary>
+    /// <summary>Configuración de un pin GPIO.</summary>
     public enum PinMode
     {
         Input,
-        Output
+        Output,
+        /// <summary>Salida PWM (por software o por hardware): alterna entre 3,3 V y 0 V.</summary>
+        Pwm
     }
 
     /// <summary>Resistencia interna del chip conectada a la entrada.</summary>
@@ -104,6 +106,15 @@ namespace ImatPiSim.Domain.Components
         public PinMode Mode { get; private set; } = PinMode.Input;
         public PullMode Pull { get; private set; } = PullMode.None;
 
+        /// <summary>
+        /// El programa ha configurado este pin (como entrada, salida o PWM). Sirve para detectar
+        /// conflictos con funciones como SPI (docs/hardware.md §3.9).
+        /// </summary>
+        public bool IsInUse { get; private set; }
+
+        /// <summary>Señal que genera el pin en modo <see cref="PinMode.Pwm"/>; <c>null</c> en otro caso.</summary>
+        public PwmSignal Pwm { get; private set; }
+
         /// <summary>Nivel que el programa ha escrito (solo cuenta en modo salida).</summary>
         public bool OutputLevel { get; private set; }
 
@@ -127,6 +138,8 @@ namespace ImatPiSim.Domain.Components
         {
             Mode = PinMode.Input;
             Pull = pull;
+            Pwm = null;
+            IsInUse = true;
         }
 
         public void ConfigureAsOutput(bool initialLevel = false)
@@ -134,6 +147,24 @@ namespace ImatPiSim.Domain.Components
             Mode = PinMode.Output;
             Pull = PullMode.None;   // en salida no tiene sentido la pull
             OutputLevel = initialLevel;
+            Pwm = null;
+            IsInUse = true;
+        }
+
+        /// <summary>Configura el pin como salida PWM (como <c>PWMLED</c> o <c>AngularServo</c>).</summary>
+        public void ConfigureAsPwm(double frequency, double dutyCycle)
+        {
+            Mode = PinMode.Pwm;
+            Pull = PullMode.None;
+            Pwm = new PwmSignal(frequency, dutyCycle);
+            IsInUse = true;
+        }
+
+        /// <summary>Cambia el factor de servicio manteniendo la frecuencia.</summary>
+        public void SetDutyCycle(double dutyCycle)
+        {
+            if (Mode != PinMode.Pwm) throw new InvalidOperationException($"GPIO{Bcm} no está en modo PWM.");
+            Pwm = new PwmSignal(Pwm.Frequency, dutyCycle);
         }
 
         /// <summary>Escribe un nivel (como <c>GPIO.output</c> o <c>led.on()</c>).</summary>
@@ -163,6 +194,16 @@ namespace ImatPiSim.Domain.Components
                 ctx.AddConductanceTo(Pin.Node, 1.0 / OutputResistance, OutputLevel ? SupplyVoltage : 0.0);
                 return;
             }
+            if (Mode == PinMode.Pwm)
+            {
+                // Propuesta A (docs/arquitectura.md §6.4): se resuelve en HIGH para comprobar las
+                // corrientes de pico; LEDs y servos interpretan después la señal declarada.
+                // Con un factor de servicio 0 el pin nunca sube: se resuelve en LOW.
+                bool high = Pwm.DutyCycle > 0;
+                ctx.AddConductanceTo(Pin.Node, 1.0 / OutputResistance, high ? SupplyVoltage : 0.0);
+                ctx.DeclarePwm(Pin.Node, Pwm);
+                return;
+            }
             if (Pull == PullMode.Up) ctx.AddConductanceTo(Pin.Node, 1.0 / PullResistance, SupplyVoltage);
             else if (Pull == PullMode.Down) ctx.AddConductanceTo(Pin.Node, 1.0 / PullResistance, 0.0);
             // PullMode.None: entrada ideal de alta impedancia, no estampa nada.
@@ -174,6 +215,8 @@ namespace ImatPiSim.Domain.Components
 
             if (Mode == PinMode.Output)
                 Current = ((OutputLevel ? SupplyVoltage : 0.0) - Voltage) / OutputResistance;
+            else if (Mode == PinMode.Pwm)
+                Current = ((Pwm.DutyCycle > 0 ? SupplyVoltage : 0.0) - Voltage) / OutputResistance;   // pico
             else if (Pull == PullMode.Up)
                 Current = (SupplyVoltage - Voltage) / PullResistance;
             else if (Pull == PullMode.Down)
@@ -201,12 +244,15 @@ namespace ImatPiSim.Domain.Components
             Mode = PinMode.Input;
             Pull = PullMode.None;
             OutputLevel = false;
+            Pwm = null;
+            IsInUse = false;
             Voltage = 0;
             Current = 0;
             Level = InputLevel.Low;
             _lastReadLevel = false;
         }
 
-        public override string ToString() => $"GPIO{Bcm} ({Mode}{(Mode == PinMode.Input ? ", pull " + Pull : "")})";
+        public override string ToString() =>
+            $"GPIO{Bcm} ({Mode}{(Mode == PinMode.Input ? ", pull " + Pull : "")}{(Mode == PinMode.Pwm ? ", " + Pwm : "")})";
     }
 }

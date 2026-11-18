@@ -10,11 +10,17 @@ namespace ImatPiSim.Domain.Components
     /// </summary>
     /// <remarks>
     /// Pines: "GPIO0".."GPIO27", "3V3", "5V" y "GND". La numeración es BCM, no la física del
-    /// conector (GPIO7 es el pin físico 26). Los conflictos de funciones (SPI, PWM...) llegan en E5.
+    /// conector (GPIO7 es el pin físico 26).
+    /// Conflictos de funciones (docs/hardware.md §3.9): con el SPI0 activo, los pines GPIO7–11 son
+    /// del bus; si el programa los usa como GPIO (p. ej. el pulsador SW1 en GPIO7), es un fallo.
+    /// SPI1 y la UART no se modelan.
     /// </remarks>
-    public sealed class RaspberryPi : Component
+    public sealed class RaspberryPi : Component, IFaultSource
     {
         public const int GpioCount = 28;
+
+        /// <summary>Pines del bus SPI0: CE1 = 7, CE0 = 8, MISO = 9, MOSI = 10, SCLK = 11.</summary>
+        public static readonly int[] Spi0Pins = { 7, 8, 9, 10, 11 };
 
         private readonly GpioPin[] _gpio = new GpioPin[GpioCount];
 
@@ -46,6 +52,21 @@ namespace ImatPiSim.Domain.Components
 
         public IReadOnlyList<GpioPin> AllGpio => _gpio;
 
+        /// <summary>
+        /// Interfaz SPI0 activada (<c>raspi-config</c>). Desactivada por defecto, como en
+        /// Raspberry Pi OS: hay que activarla para leer el MCP3008 (práctica 5).
+        /// </summary>
+        public bool SpiEnabled { get; set; }
+
+        public IEnumerable<Fault> CheckFaults()
+        {
+            if (!SpiEnabled) yield break;
+            foreach (var bcm in Spi0Pins)
+                if (_gpio[bcm].IsInUse)
+                    yield return new Fault(FaultKind.PinConflict,
+                        $"GPIO{bcm} se usa como GPIO con el SPI activado (es un pin del bus SPI0)", 0, 0, "");
+        }
+
         public override IEnumerable<IElectricalElement> ElectricalElements()
         {
             yield return Rail3V3;
@@ -57,6 +78,7 @@ namespace ImatPiSim.Domain.Components
         public override void Reset()
         {
             foreach (var g in _gpio) g.Reset();
+            SpiEnabled = false;
         }
     }
 }

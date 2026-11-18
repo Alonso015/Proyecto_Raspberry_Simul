@@ -66,7 +66,7 @@ namespace ImatPiSim.Domain.Components
             }
 
             // ---- ADC: CH0–CH6 a J1.1–J1.7; CH7 por JP3 a RV1 (de fábrica) o a J1.8
-            Adc = AddChild(new Mcp3008("U1"));
+            Adc = AddChild(new Mcp3008("U1", () => pi.SpiEnabled));
             Potentiometer = AddChild(new Potentiometer("RV1", PotResistance));
             Jp3 = AddChild(new ThreeWayJumper("JP3", JumperSelection.Pad1));
             Link(Potentiometer.End1, v33);

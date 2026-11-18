@@ -61,8 +61,18 @@ namespace ImatPiSim.Domain.Components
         /// <summary>Corriente ánodo → cátodo en la última resolución (A).</summary>
         public double Current { get; private set; }
 
-        /// <summary>Brillo relativo 0..1, proporcional a la corriente (1 = <see cref="MaxCurrent"/>).</summary>
-        public double Brightness => IsBurnt ? 0 : Math.Max(0, Math.Min(1, Current / MaxCurrent));
+        /// <summary>
+        /// Fracción del tiempo que el LED está alimentado: 1 en continua; el factor de servicio
+        /// si lo excita una señal PWM.
+        /// </summary>
+        public double DutyFactor { get; private set; } = 1.0;
+
+        /// <summary>
+        /// Brillo relativo medio 0..1: proporcional a la corriente en estado alto (1 =
+        /// <see cref="MaxCurrent"/>) por la fracción del tiempo que está encendido. Con PWM de
+        /// más de ~60 Hz el ojo solo percibe esta media (práctica 4).
+        /// </summary>
+        public double Brightness => IsBurnt ? 0 : Math.Max(0, Math.Min(1, Current / MaxCurrent)) * DutyFactor;
 
         public bool IsBurnt { get; private set; }
 
@@ -95,7 +105,10 @@ namespace ImatPiSim.Domain.Components
         public override void OnSolved(ISolution solution)
         {
             double before = Current;
+            double beforeDuty = DutyFactor;
             bool wasBurnt = IsBurnt;
+            var pwm = solution.PwmAt(Anode.Node) ?? solution.PwmAt(Cathode.Node);
+            DutyFactor = pwm?.DutyCycle ?? 1.0;
             if (IsBurnt || !IsConducting)
             {
                 Current = 0;
@@ -110,7 +123,8 @@ namespace ImatPiSim.Domain.Components
                     BurnCurrent = Current;
                 }
             }
-            if (Math.Abs(Current - before) > 1e-12 || wasBurnt != IsBurnt) RaiseStateChanged();
+            if (Math.Abs(Current - before) > 1e-12 || Math.Abs(DutyFactor - beforeDuty) > 1e-12 || wasBurnt != IsBurnt)
+                RaiseStateChanged();
         }
 
         public IEnumerable<Fault> CheckFaults()

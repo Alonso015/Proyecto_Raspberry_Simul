@@ -69,6 +69,7 @@ namespace ImatPiSim.Domain.Components
             f.Register(ComponentTypes.Potentiometer, (t, id, p) =>
                 new Potentiometer(id, p["resistance"], p["position"]));
             f.Register(ComponentTypes.Ldr, (t, id, p) => new Ldr(id, p["illuminance"]));
+            f.Register(ComponentTypes.Servo, (t, id, p) => new Servo(id, p["initialAngle"], p["maxSpeed"]));
             return f;
         }
     }

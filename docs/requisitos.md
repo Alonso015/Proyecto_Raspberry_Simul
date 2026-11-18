@@ -208,6 +208,10 @@ Alternativas descartadas:
 | Resistencia de un puente de soldadura unido (JP1–JP3) | 1 mΩ (E4, aceptado el 18/11/2026) | No está en las fuentes. Prácticamente un cable |
 | Resistencia mínima de cada tramo del potenciómetro | 0,01 Ω (E4, aceptado el 18/11/2026) | Evita un cortocircuito ideal en los extremos del recorrido |
 | Resistencia de la LDR en oscuridad total | 1 MΩ (E4, aceptado el 18/11/2026) | El datasheet solo da un mínimo de 0,5 MΩ. Fuera de la tabla de la práctica 5 (40–1200 lx) se extrapola en log-log |
+| Velocidad máxima del servo | 600 °/s (E5, aceptado el 18/11/2026) | No está en las fuentes. Del orden de 0,1 s cada 60°, típico de servos pequeños |
+| Alimentación mínima para que el servo se mueva | 4 V entre VCC y GND (E5, aceptado el 18/11/2026) | No está en las fuentes. Sin 5 V el servo no se mueve; no se modela su consumo |
+| Conversor MCP3008 | Ideal: código = ⌊1024·V/3,3⌋ en 0..1023, sin ruido ni offset; más de 3,4 V en un canal = daño (E5) | Fórmula de 10 bits sobre V_ref (F4, F5); el margen es el mismo supuesto que en los GPIO |
+| SPI0 al arrancar | Desactivado (E5) | Como en Raspberry Pi OS: la práctica 5 pide activarlo con `raspi-config` |
 
 ### 2.7 Representación visual
 

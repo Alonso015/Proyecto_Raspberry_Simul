@@ -18,6 +18,7 @@ namespace ImatPiSim.Domain.Electrical
         private readonly List<Node> _unknowns = new List<Node>();
         private readonly double[,] _g;
         private readonly double[] _i;
+        private readonly Dictionary<Node, PwmSignal> _pwm = new Dictionary<Node, PwmSignal>();
 
         public MatrixStamper(Netlist netlist)
         {
@@ -82,6 +83,15 @@ namespace ImatPiSim.Domain.Electrical
             // Una fuente que entra en un nodo de tensión fija la absorbe el raíl ideal.
             if (_unknownIndex.TryGetValue(into, out var idx)) _i[idx] += amps;
         }
+
+        public void DeclarePwm(Node node, PwmSignal signal)
+        {
+            if (node == null) throw new ArgumentNullException(nameof(node));
+            _pwm[node] = signal ?? throw new ArgumentNullException(nameof(signal));
+        }
+
+        /// <summary>Nodos excitados directamente por una señal PWM.</summary>
+        public IReadOnlyDictionary<Node, PwmSignal> DeclaredPwm => _pwm;
 
         /// <summary>
         /// Conductancia mínima de cada nodo incógnita a 0 V. Evita que la matriz sea singular

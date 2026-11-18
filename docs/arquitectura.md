@@ -216,7 +216,7 @@ Son modelos, no datos de la placa real:
 | Valores sin documentar | Resistencia interna del GPIO, umbral de lectura HIGH/LOW y velocidad del servo se marcan como *supuesto* en el diagrama hasta tener datos |
 | Lectura de entradas | Una entrada se lee con la tensión calculada en el tick anterior (§3) |
 
-### 6.4 Decisión abierta: PWM en el solver
+### 6.4 PWM en el solver (decidido el 18/11/2026: propuesta A)
 
 El análisis nodal es de continua, pero un pin PWM alterna entre 3,3 V y 0 V. Lo que importa depende del componente que esté conectado (es la distinción entre potencia media y pulsos de control):
 
@@ -233,7 +233,7 @@ Por eso no sirve sustituir el PWM por su tensión media (1,65 V con un 50 %): po
 - **Brillo:** el LED escala su brillo por el factor de servicio.
 - **Servo:** recibe el `PwmSignal` del nodo al que está conectado (`ISolution.PwmAt`) y calcula el ángulo a partir del ancho de pulso.
 
-Se cerrará al diseñar el motor de simulación.
+**Decidido (18/11/2026): propuesta A**, implementada en E5. Se descartó la alternativa de resolver dos veces (HIGH y LOW) y ponderar por el factor de servicio: costaba el doble por tick, no era exacta con varios PWM y ningún reto la necesita.
 
 ### 6.5 Estado de la implementación (E1, 18/11/2026)
 
@@ -293,6 +293,19 @@ Los valores numéricos son supuestos y están en requisitos.md §2.6.
 | `ImatHat` | Cableada según el esquema (hardware.md §3): D1–D8 + R1–R8 + JP1/JP2, SW1–SW4, RV1 + JP3 → CH7 de U1. Los conectores J1, J2, J3, J7–J12 y TP1 son pines que apuntan al mismo terminal que la pista |
 | Fuera del modelo por ahora | El L293 y J4–J6 (motores, ampliación), C1–C10 y BackPower |
 | `Mcp3008` | De momento solo entradas de alta impedancia. La conversión llega en E5 |
+
+**Etapa E5 (18/11/2026):** PWM, servo, ADC y conflictos de pines.
+
+| Pieza | Detalle |
+|-------|---------|
+| `PwmSignal` | Frecuencia, factor de servicio, periodo y ancho de pulso |
+| `IStampContext.DeclarePwm` / `ISolution.PwmAt` | El pin PWM se estampa en HIGH (corrientes de pico) y declara su señal. Tras resolver, la señal se propaga por los nodos unidos a través de elementos. No atraviesa raíles ni elementos `ISignalIsolating` (los canales del MCP3008). Si llegan dos PWM al mismo nodo, se queda la de mayor factor de servicio (aproximación) |
+| `GpioPin` en modo `Pwm` | `ConfigureAsPwm(f, d)` y `SetDutyCycle(d)`. Con d = 0 se resuelve en LOW. `IsInUse` marca que el programa ha configurado el pin |
+| `Led.DutyFactor` | Brillo = (I_pico / I_máx) × factor de servicio. Un LED sin resistencia se quema aunque el PWM sea bajo, porque cuenta la corriente de pico |
+| `IBehavioralComponent.Update(dt)` | Se aparta del diagrama: no recibe la solución. El componente la guarda en `OnSolved` |
+| `Servo` | Pines SIG, VCC y GND. De 0,5 a 2,5 ms → de 0 a 180° (lineal, con topes). `TargetAngle` cambia al instante y `Angle` lo sigue a velocidad limitada. Sin alimentación no se mueve; sin señal mantiene su posición |
+| `Mcp3008` | Cuantización de 10 bits; `Read`, `ReadValue` (/1023) y `ReadVoltage` como en gpiozero. Solo se puede leer con el SPI activado. Sobretensión por canal |
+| `RaspberryPi.SpiEnabled` y conflictos | Con SPI0 activo, usar GPIO7–11 como GPIO es `PinConflict`. `FaultDetector.Detect(netlist, pi)` acepta fuentes de fallo que no son elementos del circuito |
 
 ## 7. Decisiones abiertas para la siguiente iteración
 

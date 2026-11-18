@@ -53,6 +53,7 @@ namespace ImatPiSim.Domain.Electrical
                 foreach (var nl in nonlinear) changed |= nl.UpdateRegion(solution);
                 if (changed) continue;
 
+                solution.SetPwm(PropagatePwm(netlist, LastSystem.DeclaredPwm));
                 foreach (var e in netlist.Elements) e.OnSolved(solution);
                 return solution;
             }
@@ -81,11 +82,65 @@ namespace ImatPiSim.Domain.Electrical
             return new NodalSolution(voltages);
         }
 
+        /// <summary>
+        /// Lleva cada señal PWM desde su nodo de origen a todos los nodos unidos a él a través de
+        /// elementos (resistencias, LEDs...), sin atravesar nodos de tensión fija (raíles) ni
+        /// elementos de entradas independientes (<see cref="ISignalIsolating"/>).
+        /// </summary>
+        /// <remarks>
+        /// Aproximación: si dos PWM llegan al mismo nodo, se queda la de mayor factor de servicio.
+        /// </remarks>
+        private static Dictionary<Node, PwmSignal> PropagatePwm(Netlist netlist, IReadOnlyDictionary<Node, PwmSignal> sources)
+        {
+            var result = new Dictionary<Node, PwmSignal>();
+            if (sources.Count == 0) return result;
+
+            var neighbours = new Dictionary<Node, HashSet<Node>>();
+            foreach (var e in netlist.Elements)
+            {
+                if (e is ISignalIsolating || e.Terminals.Count < 2) continue;
+                foreach (var a in e.Terminals)
+                foreach (var b in e.Terminals)
+                {
+                    if (a.Node == b.Node) continue;
+                    if (!neighbours.TryGetValue(a.Node, out var set)) neighbours[a.Node] = set = new HashSet<Node>();
+                    set.Add(b.Node);
+                }
+            }
+
+            foreach (var source in sources)
+            {
+                var queue = new Queue<Node>();
+                var seen = new HashSet<Node> { source.Key };
+                queue.Enqueue(source.Key);
+                while (queue.Count > 0)
+                {
+                    var n = queue.Dequeue();
+                    if (!result.TryGetValue(n, out var existing) || existing.DutyCycle < source.Value.DutyCycle)
+                        result[n] = source.Value;
+                    if (n.IsFixed && n != source.Key) continue;   // un raíl fija la tensión: la señal no pasa
+                    if (!neighbours.TryGetValue(n, out var next)) continue;
+                    foreach (var m in next)
+                        if (seen.Add(m) && !m.IsFixed) queue.Enqueue(m);
+                }
+            }
+            return result;
+        }
+
         private sealed class NodalSolution : ISolution
         {
             private readonly Dictionary<Node, double> _voltages;
+            private Dictionary<Node, PwmSignal> _pwm = new Dictionary<Node, PwmSignal>();
 
             public NodalSolution(Dictionary<Node, double> voltages) => _voltages = voltages;
+
+            public void SetPwm(Dictionary<Node, PwmSignal> pwm) => _pwm = pwm;
+
+            public PwmSignal PwmAt(Node node)
+            {
+                if (node == null) throw new ArgumentNullException(nameof(node));
+                return _pwm.TryGetValue(node, out var s) ? s : null;
+            }
 
             public double VoltageAt(Node node)
             {

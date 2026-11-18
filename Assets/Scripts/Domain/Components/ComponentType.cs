@@ -68,6 +68,10 @@ namespace ImatPiSim.Domain.Components
             "mcp3008", "Conversor A/D MCP3008",
             new[] { "CH0", "CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7" });
 
+        public static readonly ComponentType Servo = new ComponentType(
+            "servo", "Servomotor", new[] { "SIG", "VCC", "GND" },
+            new Dictionary<string, double> { ["initialAngle"] = 90, ["maxSpeed"] = Components.Servo.DefaultMaxSpeed });
+
         public static readonly ComponentType RaspberryPi = new ComponentType(
             "raspberrypi", "Raspberry Pi", Array.Empty<string>());
 

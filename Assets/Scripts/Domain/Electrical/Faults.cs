@@ -14,7 +14,9 @@ namespace ImatPiSim.Domain.Electrical
         /// <summary>Un GPIO recibe más de 3,3 V (p. ej., lógica de 5 V).</summary>
         Overvoltage,
         /// <summary>Dos raíles de distinta tensión unidos en el mismo nodo.</summary>
-        ShortCircuit
+        ShortCircuit,
+        /// <summary>Un pin se usa a la vez como GPIO y para otra función activa (p. ej. SPI).</summary>
+        PinConflict
     }
 
     /// <summary>Un fallo detectado, con la magnitud que lo provoca y el límite superado.</summary>
@@ -61,6 +63,8 @@ namespace ImatPiSim.Domain.Electrical
                         return $"{SourceId} dañado: {Fmt(Value)} en el pin (máx. {Fmt(Limit)}).";
                     case FaultKind.ShortCircuit:
                         return $"Cortocircuito: {SourceId}.";
+                    case FaultKind.PinConflict:
+                        return $"Conflicto de pines: {SourceId}.";
                     default:
                         return Kind.ToString();
                 }
@@ -83,7 +87,12 @@ namespace ImatPiSim.Domain.Electrical
     /// </summary>
     public static class FaultDetector
     {
-        public static IReadOnlyList<Fault> Detect(Netlist netlist)
+        /// <param name="netlist">Circuito (ya resuelto, salvo que tenga cortocircuitos).</param>
+        /// <param name="extraSources">
+        /// Fuentes de fallo que no son elementos del circuito (p. ej. la Raspberry Pi, que
+        /// comprueba los conflictos de pines).
+        /// </param>
+        public static IReadOnlyList<Fault> Detect(Netlist netlist, params IFaultSource[] extraSources)
         {
             if (netlist == null) throw new ArgumentNullException(nameof(netlist));
             var faults = new List<Fault>();
@@ -96,6 +105,9 @@ namespace ImatPiSim.Domain.Electrical
             foreach (var e in netlist.Elements)
                 if (e is IFaultSource source)
                     faults.AddRange(source.CheckFaults());
+            if (extraSources != null)
+                foreach (var source in extraSources)
+                    if (source != null) faults.AddRange(source.CheckFaults());
             return faults;
         }
     }

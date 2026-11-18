@@ -64,6 +64,13 @@ namespace ImatPiSim.Domain.Electrical
         /// <paramref name="into"/> (negativa si sale).
         /// </summary>
         void AddCurrentSource(Node into, double amps);
+
+        /// <summary>
+        /// Declara que el nodo está excitado por una señal PWM. Para el cálculo de corrientes el
+        /// elemento estampa su estado HIGH (corrientes de pico); la señal se propaga después a los
+        /// nodos que dependen de él para que LEDs y servos la interpreten.
+        /// </summary>
+        void DeclarePwm(Node node, PwmSignal signal);
     }
 
     /// <summary>Resultado de resolver un circuito.</summary>
@@ -71,6 +78,12 @@ namespace ImatPiSim.Domain.Electrical
     {
         /// <summary>Tensión del nodo respecto a GND (0 V).</summary>
         double VoltageAt(Node node);
+
+        /// <summary>
+        /// Señal PWM que llega a este nodo, o <c>null</c> si no hay ninguna. Llega a través de
+        /// resistencias, LEDs, pulsadores... pero no atraviesa raíles ni entradas independientes.
+        /// </summary>
+        PwmSignal PwmAt(Node node);
     }
 
     /// <summary>
