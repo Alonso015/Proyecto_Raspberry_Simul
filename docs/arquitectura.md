@@ -235,6 +235,28 @@ Por eso no sirve sustituir el PWM por su tensión media (1,65 V con un 50 %): po
 
 Se cerrará al diseñar el motor de simulación.
 
+### 6.5 Estado de la implementación (E1, 18/11/2026)
+
+Implementado en `Assets/Scripts/Domain/Electrical` y `Components/Resistor.cs`, con tests en `Assets/Tests/EditMode/Electrical`.
+
+**Diferencias con el diagrama v0.2** (a reflejar al actualizar el UML en E-UML):
+
+| Cambio | Motivo |
+|--------|--------|
+| Nuevo `IVoltageReference`, implementado por `VoltageRail` (raíles 3V3, 5V, GND) | Los raíles no estampan nada: fijan la tensión de su nodo al construir la netlist |
+| Nuevo `ShortCircuit` y `Netlist.ShortCircuits` | Un nodo con dos raíles de tensión distinta se detecta sin resolver. `NodalSolver` se niega a resolverlo. En E3 se convertirá en `Fault` |
+| Desaparece `Netlist.Ground` | GND es un raíl más a 0 V. `gmin` conecta cada incógnita a 0 V |
+| `IStampContext.DeclarePwm` todavía no existe | Llega en E5 |
+| `NodalSolver.LastSystem` y `MatrixStamper.Describe()` | Para inspeccionar la matriz G·V = I al depurar y al explicar |
+| `Resistor` implementa `IElectricalElement` directamente | En E4 heredará de `Component` |
+
+**Valores numéricos:**
+
+| Parámetro | Valor | Detalle |
+|-----------|-------|---------|
+| `gmin` | 1e-12 S (1 TΩ) | Error relativo de ~1e-9 en un divisor de 1 kΩ |
+| Umbral de pivote | 1e-300 | Si se alcanza, la matriz es singular y se lanza una excepción con el nodo afectado |
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |
