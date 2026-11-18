@@ -71,10 +71,10 @@ Sigue las reglas de docs/hoja_de_ruta.md (en esta etapa sí puedes hacer commit 
 
 ### E0.2. Proyecto Unity y estructura de código
 
-> Antes de este prompt: **instala Unity 6000.6.8f1** desde Unity Hub. Si no la encuentras, búscala en el archivo de versiones de la web de Unity.
+> Antes de este prompt: **instala Unity 6000.0.85f2** desde Unity Hub. Si no la encuentras, búscala en el archivo de versiones de la web de Unity.
 
 ```text
-Ya tengo instalado Unity 6000.6.8f1. Crea la estructura del proyecto según docs/arquitectura.md §1 (dominio en C# puro, independiente de Unity):
+Ya tengo instalado Unity 6000.0.85f2. Crea la estructura del proyecto según docs/arquitectura.md §1 (dominio en C# puro, independiente de Unity):
 - El repo es el proyecto Unity (Assets/, Packages/, ProjectSettings/). Crea el proyecto 2D con esa versión y añade el .gitignore estándar de Unity sin perder las reglas actuales.
 - Assets/Scripts/Domain con un asmdef sin referencias al motor (noEngineReferences).
 - Assets/Tests/EditMode con un asmdef de tests NUnit que referencie el dominio.
@@ -518,7 +518,7 @@ Sigue las reglas de docs/hoja_de_ruta.md. Rama: docs/entrega-2.
 
 **Comprueba:**
 
-- Descomprime el `.zip` en otra carpeta, abre el proyecto con Unity 6000.6.8f1 y ejecuta el build.
+- Descomprime el `.zip` en otra carpeta, abre el proyecto con Unity 6000.0.85f2 y ejecuta el build.
 
 ---
 

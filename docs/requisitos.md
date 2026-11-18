@@ -8,7 +8,7 @@ Fuente: enunciado del proyecto final de Paradigmas de la Programación, curso 20
 
 | Id | Requisito | Cómo lo cumplimos |
 |----|-----------|-------------------|
-| R1 | Videojuego o simulación en **Unity 6000.6.8f1** | Proyecto creado con esa versión exacta |
+| R1 | Videojuego o simulación en **Unity 6000.0.85f2** | Proyecto creado con esa versión exacta |
 | R2 | Desarrollo **por parejas** | Pendiente: confirmar pareja y reparto |
 | R3 | Incluir **IA programada**. En una simulación, un algoritmo de IA (camino óptimo, algoritmo genético, clasificación…) | Autorouter de cables con **A\*** (§2.3) |
 | R4 | **Loop cerrado**: Play → jugar → victoria / derrota → jugar otra vez, con reinicio correcto | **Modo retos** (§2.2) |
