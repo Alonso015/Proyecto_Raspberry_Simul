@@ -248,7 +248,7 @@ namespace ImatPiSim.Domain.Tests.Interpreter
         {
             var ex = Fails(src);
             Assert.That(ex.Detail, Does.Contain(fragment));
-            Assert.That(ex.Message, Does.StartWith("Línea 1, columna"));
+            Assert.That(ex.Message, Does.StartWith("Error léxico en la línea 1, columna"));
         }
     }
 }

@@ -319,6 +319,53 @@ Los valores numéricos son supuestos y están en requisitos.md §2.6.
 | Cadenas | Comillas simples o dobles, triples (varias líneas), escapes básicos y `r'...'`. Las f-strings y los bytes dan un error claro |
 | Palabras clave fuera del subconjunto | `try`, `class`, `with`… se reconocen como palabras clave para que el parser dé un error explicativo en vez de "nombre desconocido" |
 
+**Etapa E7 (18/11/2026):** analizador sintáctico y árbol del programa.
+
+| Pieza | Detalle |
+|-------|---------|
+| `Ast.cs` | Nodos del árbol (**Composite**). `Expr`: número, cadena, constante, nombre, unaria, binaria, lógica, comparación encadenada, llamada (posicional y con nombre), atributo, índice, lista o tupla, lambda y expresión condicional. `Stmt`: expresión, asignación (múltiple), asignación compuesta, if (un `elif` es un `if` dentro del `else`), while, for, break, continue, pass, return, def, global, nonlocal e import |
+| `IAstVisitor<T>` | **Visitor**: un método por clase de nodo. Cada operación sobre el árbol (imprimir, comprobar, ejecutar) es un visitor nuevo sin tocar los nodos |
+| `AstPrinter` | Primer visitor. Expresiones en forma prefija (`(+ 2 (* 3 4))`) y sentencias una por línea |
+| `Parser` | Descenso recursivo: un método por regla; la precedencia sale de qué método llama a cuál |
+| `ScriptException` | Base común de `LexerException` y `ParseException` (y de los errores de ejecución en E8), con línea, columna y mensaje |
+
+**Gramática** (de menor a mayor precedencia):
+
+```
+expression := lambda | or_test ['if' or_test 'else' expression]
+or_test    := and_test ('or' and_test)*
+and_test   := not_test ('and' not_test)*
+not_test   := 'not' not_test | comparison
+comparison := bit_or (comp_op bit_or)*          comp_op: < > <= >= == != in, not in, is, is not
+bit_or     := bit_xor ('|' bit_xor)*
+bit_xor    := bit_and ('^' bit_and)*
+bit_and    := shift ('&' shift)*
+shift      := arith (('<<' | '>>') arith)*
+arith      := term (('+' | '-') term)*
+term       := factor (('*' | '/' | '//' | '%') factor)*
+factor     := ('+' | '-' | '~') factor | power
+power      := primary ['**' factor]                   (asocia por la derecha)
+primary    := atom ('(' args ')' | '.' NAME | '[' expression ']')*
+atom       := NAME | NUMBER | STRING+ | True | False | None | '(' ... ')' | '[' ... ']'
+```
+
+**Fuera del subconjunto:** dan un error que dice "no está soportado":
+
+- `class`
+- `with`
+- listas por comprensión y generadores
+- diccionarios
+- cortes (`lista[a:b]`)
+- asignación a varias variables (`a, b = ...`)
+- `*args`
+- `from x import *`
+
+**Decidido (18/11/2026): `try` / `except` / `finally` básico.** Aparece en casi todos los programas de las prácticas (`try: main() except KeyboardInterrupt: ... finally: GPIO.cleanup()`).
+
+- Se analiza `try`, cero o más `except [Tipo] [as nombre]` (el que no lleva tipo, al final) y un `finally` opcional; al menos uno de los dos. Nodo `TryStmt`.
+- En E8, el botón **Parar** del simulador lanzará `KeyboardInterrupt`, como Ctrl+C.
+- No soportado: `raise`, `except (A, B)` y el `else` de un `try`.
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |

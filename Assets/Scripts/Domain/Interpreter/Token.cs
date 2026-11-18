@@ -72,24 +72,6 @@ namespace ImatPiSim.Domain.Interpreter
             Value != null ? $"{Type}({Lexeme}) @{Line}:{Column}" : $"{Type} @{Line}:{Column}";
     }
 
-    /// <summary>Error de análisis léxico con la posición exacta, en castellano para el jugador.</summary>
-    public sealed class LexerException : Exception
-    {
-        public LexerException(string message, int line, int column)
-            : base($"Línea {line}, columna {column}: {message}")
-        {
-            Line = line;
-            Column = column;
-            Detail = message;
-        }
-
-        public int Line { get; }
-        public int Column { get; }
-
-        /// <summary>El mensaje sin la posición.</summary>
-        public string Detail { get; }
-    }
-
     internal static class Keywords
     {
         public static readonly Dictionary<string, TokenType> ByText = new Dictionary<string, TokenType>(StringComparer.Ordinal)

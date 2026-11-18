@@ -135,7 +135,8 @@ Alternativas descartadas:
 |----------|---------------------------|
 | Enteros, decimales, booleanos, cadenas; variables | Clases de usuario |
 | Operadores aritméticos, de comparación, lógicos y a nivel de bit | `import` de librerías arbitrarias (solo `from gpiozero import ...` y `from time import sleep`, que el intérprete reconoce) |
-| `if` / `elif` / `else`, `while`, `for ... in range(...)`, `break` | Listas por comprensión, excepciones de usuario |
+| `if` / `elif` / `else`, `while`, `for ... in range(...)`, `break` | Listas por comprensión, lanzar excepciones (`raise`) y clases de excepción propias |
+| `try` / `except [Tipo] [as e]` / `finally` (básico, decidido el 18/11/2026): el botón **Parar** lanza `KeyboardInterrupt`, como Ctrl+C en la Pi | `except (A, B)`, `else` de `try` |
 | `def`, `return`, llamadas a funciones, `lambda` simple para callbacks | Generadores, decoradores, `async` |
 | `sleep()`, `print()` | |
 | `LED`, `PWMLED`, `LEDBoard`, `Button`, `AngularServo`, `MCP3008` con sus métodos y propiedades básicos | Resto de clases de gpiozero |
