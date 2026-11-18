@@ -205,6 +205,9 @@ Alternativas descartadas:
 | Resistencia del contacto de un pulsador | 0,1 Ω (E2, aceptado el 18/11/2026) | No está en las fuentes. Pulsador suelto = circuito abierto ideal; sin rebotes |
 | Resistencia serie del LED en conducción | 10 Ω (E3, aceptado el 18/11/2026) | No está en las fuentes. Modelo lineal a trozos: V_F + R_S; valor típico de un LED de 5 mm |
 | Margen de sobretensión en un GPIO | 3,3 V + 0,1 V (E3, aceptado el 18/11/2026) | Las fuentes dicen que más de 3,3 V daña la Pi. El margen evita confundir el redondeo numérico con un fallo |
+| Resistencia de un puente de soldadura unido (JP1–JP3) | 1 mΩ (E4, aceptado el 18/11/2026) | No está en las fuentes. Prácticamente un cable |
+| Resistencia mínima de cada tramo del potenciómetro | 0,01 Ω (E4, aceptado el 18/11/2026) | Evita un cortocircuito ideal en los extremos del recorrido |
+| Resistencia de la LDR en oscuridad total | 1 MΩ (E4, aceptado el 18/11/2026) | El datasheet solo da un mínimo de 0,5 MΩ. Fuera de la tabla de la práctica 5 (40–1200 lx) se extrapola en log-log |
 
 ### 2.7 Representación visual
 

@@ -13,44 +13,46 @@ namespace ImatPiSim.Domain.Components
     /// Aproximación: no se simulan los rebotes mecánicos ni el condensador antirrebote de la
     /// IMAT HAT (C1–C4), que en continua es un circuito abierto (docs/arquitectura.md §6.3).
     /// </remarks>
-    public sealed class PushButton : IElectricalElement
+    public sealed class PushButton : ElectricalComponent
     {
         /// <summary>Supuesto: resistencia del contacto cerrado (Ω).</summary>
         public const double DefaultContactResistance = 0.1;
 
-        private readonly Terminal[] _terminals;
-
         public PushButton(string id, double contactResistance = DefaultContactResistance)
+            : base(id, ComponentTypes.PushButton)
         {
-            if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("El pulsador necesita un id.", nameof(id));
             if (!(contactResistance > 0)) throw new ArgumentOutOfRangeException(nameof(contactResistance));
-            Id = id;
             ContactResistance = contactResistance;
-            A = new Terminal(id + ".A");
-            B = new Terminal(id + ".B");
-            _terminals = new[] { A, B };
+            A = CreateTerminal("A");
+            B = CreateTerminal("B");
         }
 
-        public string Id { get; }
         public double ContactResistance { get; }
         public Terminal A { get; }
         public Terminal B { get; }
-        public IReadOnlyList<Terminal> Terminals => _terminals;
-
         public bool IsPressed { get; private set; }
 
         /// <summary>Corriente de A a B en la última resolución (A).</summary>
         public double Current { get; private set; }
 
-        public void Press() => IsPressed = true;
-        public void Release() => IsPressed = false;
+        public void Press() => SetPressed(true);
+        public void Release() => SetPressed(false);
 
-        public void Stamp(IStampContext ctx)
+        private void SetPressed(bool pressed)
+        {
+            if (IsPressed == pressed) return;
+            IsPressed = pressed;
+            RaiseStateChanged();
+        }
+
+        public override void Reset() => Release();
+
+        public override void Stamp(IStampContext ctx)
         {
             if (IsPressed) ctx.AddConductance(A.Node, B.Node, 1.0 / ContactResistance);
         }
 
-        public void OnSolved(ISolution solution)
+        public override void OnSolved(ISolution solution)
         {
             Current = IsPressed
                 ? (solution.VoltageAt(A.Node) - solution.VoltageAt(B.Node)) / ContactResistance

@@ -18,7 +18,7 @@ namespace ImatPiSim.Domain.Components
     /// <para>V<sub>F</sub>, R<sub>S</sub> e I<sub>máx</sub> son <b>supuestos de la simulación</b>
     /// (valores típicos de un LED rojo de 5 mm; docs/requisitos.md §2.6).</para>
     /// </remarks>
-    public sealed class Led : INonlinearElement, IFaultSource
+    public sealed class Led : ElectricalComponent, INonlinearElement, IFaultSource
     {
         /// <summary>Supuesto: tensión directa (V).</summary>
         public const double DefaultForwardVoltage = 2.0;
@@ -29,27 +29,22 @@ namespace ImatPiSim.Domain.Components
         /// <summary>Supuesto: corriente máxima antes de quemarse (A).</summary>
         public const double DefaultMaxCurrent = 0.020;
 
-        private readonly Terminal[] _terminals;
-
         public Led(string id,
                    double forwardVoltage = DefaultForwardVoltage,
                    double seriesResistance = DefaultSeriesResistance,
                    double maxCurrent = DefaultMaxCurrent)
+            : base(id, ComponentTypes.Led)
         {
-            if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("El LED necesita un id.", nameof(id));
             if (!(forwardVoltage > 0)) throw new ArgumentOutOfRangeException(nameof(forwardVoltage));
             if (!(seriesResistance > 0)) throw new ArgumentOutOfRangeException(nameof(seriesResistance));
             if (!(maxCurrent > 0)) throw new ArgumentOutOfRangeException(nameof(maxCurrent));
-            Id = id;
             ForwardVoltage = forwardVoltage;
             SeriesResistance = seriesResistance;
             MaxCurrent = maxCurrent;
-            Anode = new Terminal(id + ".A");
-            Cathode = new Terminal(id + ".K");
-            _terminals = new[] { Anode, Cathode };
+            Anode = CreateTerminal("A");
+            Cathode = CreateTerminal("K");
         }
 
-        public string Id { get; }
         public double ForwardVoltage { get; }
         public double SeriesResistance { get; }
         public double MaxCurrent { get; }
@@ -59,8 +54,6 @@ namespace ImatPiSim.Domain.Components
 
         /// <summary>Cátodo (−): la patilla corta / lado plano del encapsulado.</summary>
         public Terminal Cathode { get; }
-
-        public IReadOnlyList<Terminal> Terminals => _terminals;
 
         /// <summary>Región supuesta en la resolución actual.</summary>
         public bool IsConducting { get; private set; }
@@ -76,7 +69,7 @@ namespace ImatPiSim.Domain.Components
         /// <summary>Corriente que lo quemó (A); 0 si no está quemado.</summary>
         public double BurnCurrent { get; private set; }
 
-        public void Stamp(IStampContext ctx)
+        public override void Stamp(IStampContext ctx)
         {
             if (IsBurnt || !IsConducting) return;   // circuito abierto
             // Norton de "V_F en serie con R_S": conductancia g entre A y K y una fuente g·V_F
@@ -99,20 +92,25 @@ namespace ImatPiSim.Domain.Components
             return true;
         }
 
-        public void OnSolved(ISolution solution)
+        public override void OnSolved(ISolution solution)
         {
+            double before = Current;
+            bool wasBurnt = IsBurnt;
             if (IsBurnt || !IsConducting)
             {
                 Current = 0;
-                return;
             }
-            double vak = solution.VoltageAt(Anode.Node) - solution.VoltageAt(Cathode.Node);
-            Current = (vak - ForwardVoltage) / SeriesResistance;
-            if (Current > MaxCurrent)
+            else
             {
-                IsBurnt = true;          // queda abierto a partir de la próxima resolución
-                BurnCurrent = Current;
+                double vak = solution.VoltageAt(Anode.Node) - solution.VoltageAt(Cathode.Node);
+                Current = (vak - ForwardVoltage) / SeriesResistance;
+                if (Current > MaxCurrent)
+                {
+                    IsBurnt = true;          // queda abierto a partir de la próxima resolución
+                    BurnCurrent = Current;
+                }
             }
+            if (Math.Abs(Current - before) > 1e-12 || wasBurnt != IsBurnt) RaiseStateChanged();
         }
 
         public IEnumerable<Fault> CheckFaults()
@@ -122,12 +120,13 @@ namespace ImatPiSim.Domain.Components
         }
 
         /// <summary>Repone el LED (nuevo intento del reto).</summary>
-        public void Reset()
+        public override void Reset()
         {
             IsBurnt = false;
             BurnCurrent = 0;
             IsConducting = false;
             Current = 0;
+            RaiseStateChanged();
         }
 
         public override string ToString() => $"{Id} (LED{(IsBurnt ? ", quemado" : "")})";

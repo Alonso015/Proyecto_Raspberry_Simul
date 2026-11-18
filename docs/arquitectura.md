@@ -279,6 +279,21 @@ Los valores numéricos son supuestos y están en requisitos.md §2.6.
 | `FaultDetector` estático | Junta los cortocircuitos de la netlist (sin resolver) con los fallos de los elementos. Cada fallo trae un mensaje en castellano para el jugador |
 | `FaultKind.PinConflict` | Todavía no existe; llega en E5 |
 
+**Etapa E4 (18/11/2026):** capa de Componentes y la IMAT HAT completa.
+
+| Pieza | Detalle |
+|-------|---------|
+| `Component` (abstracta) | Id, `Type`, `Pins`, `StateChanged` (Observer), `ElectricalElements()`, `InternalLinks()` y `Reset()` |
+| `ElectricalComponent` (nueva, no estaba en el diagrama) | Hoja del Composite que es a la vez `IElectricalElement`. `Resistor`, `Led`, `PushButton`, `Potentiometer`, `Ldr`, `SolderJumper`, `ThreeWayJumper` y `Mcp3008` heredan de ella |
+| `CompositeComponent` | Rol "Composite". Tiene hijos y pistas internas (`Link`), y delega `ElectricalElements()`, `InternalLinks()` y `Reset()` en sus hijos |
+| `ComponentType` + catálogo `ComponentTypes` | Flyweight: una instancia por tipo, compartida |
+| `ComponentFactory` | Registro de creadores por id de tipo. Combina los parámetros recibidos con los del tipo y rechaza parámetros desconocidos |
+| `NetlistBuilderExtensions.AddComponent` / `Connect(Pin, Pin)` | Puente entre Componentes y el modelo eléctrico, sin que el modelo eléctrico conozca los componentes |
+| `RaspberryPi` | Los 3 raíles y 28 `GpioPin`. Pines `GPIOn`, `3V3`, `5V` y `GND` |
+| `ImatHat` | Cableada según el esquema (hardware.md §3): D1–D8 + R1–R8 + JP1/JP2, SW1–SW4, RV1 + JP3 → CH7 de U1. Los conectores J1, J2, J3, J7–J12 y TP1 son pines que apuntan al mismo terminal que la pista |
+| Fuera del modelo por ahora | El L293 y J4–J6 (motores, ampliación), C1–C10 y BackPower |
+| `Mcp3008` | De momento solo entradas de alta impedancia. La conversión llega en E5 |
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |
