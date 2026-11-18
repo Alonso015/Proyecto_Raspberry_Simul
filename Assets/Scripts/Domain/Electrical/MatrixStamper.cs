@@ -64,6 +64,18 @@ namespace ImatPiSim.Domain.Electrical
             }
         }
 
+        public void AddConductanceTo(Node a, double g, double voltage)
+        {
+            if (a == null) throw new ArgumentNullException(nameof(a));
+            if (g < 0 || double.IsNaN(g) || double.IsInfinity(g))
+                throw new ArgumentOutOfRangeException(nameof(g), g, "La conductancia debe ser finita y no negativa.");
+            // Equivale a conectar g hacia un nodo de tensión fija "voltage": la parte conocida
+            // g·V pasa al término independiente (equivalente de Norton: g en paralelo con g·V).
+            if (g == 0 || !_unknownIndex.TryGetValue(a, out var ia)) return;
+            _g[ia, ia] += g;
+            _i[ia] += g * voltage;
+        }
+
         public void AddCurrentSource(Node into, double amps)
         {
             if (into == null) throw new ArgumentNullException(nameof(into));

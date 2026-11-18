@@ -33,6 +33,16 @@ namespace ImatPiSim.Domain.Electrical
         void AddConductance(Node a, Node b, double g);
 
         /// <summary>
+        /// Conductancia <paramref name="g"/> entre el nodo <paramref name="a"/> y una fuente de
+        /// tensión ideal interna de <paramref name="voltage"/> voltios (sin nodo propio).
+        /// </summary>
+        /// <remarks>
+        /// Sirve para el equivalente de Norton de una salida GPIO (fuente + resistencia interna)
+        /// y para las resistencias de pull-up / pull-down internas del chip.
+        /// </remarks>
+        void AddConductanceTo(Node a, double g, double voltage);
+
+        /// <summary>
         /// Fuente de corriente de <paramref name="amps"/> amperios que entra en el nodo
         /// <paramref name="into"/> (negativa si sale).
         /// </summary>

@@ -199,6 +199,10 @@ Alternativas descartadas:
 | Corriente máxima del LED | ~20 mA | Valor típico, no medido |
 | Valor de R1–R8 de la HAT | **270 Ω** | Ya no es supuesto: confirmado por el esquema (hardware.md §3.2) |
 | Límite de corriente por GPIO | **7 mA** (decidido 17/11/2026) | Valor de las diapositivas (hardware.md §1.2). Se descartan los 4 mA de la práctica 5 porque los LEDs de la HAT consumen ≈ 4,8 mA (hardware.md §3.2). Un único umbral: por encima, el GPIO se daña |
+| Resistencia de salida de un GPIO | 40 Ω (E2, aceptado el 18/11/2026) | No está en las fuentes. Modela que la tensión del pin cae un poco al entregar corriente (≈ 3,17 V con 1 kΩ a GND) |
+| Pull-up / pull-down interna | 50 kΩ (E2, aceptado el 18/11/2026) | No está en las fuentes. Solo importa que sea mucho mayor que el contacto de un pulsador y mucho menor que la impedancia de entrada |
+| Umbrales de lectura de una entrada | LOW ≤ 0,8 V; HIGH ≥ 2,0 V; entre ambos, *indefinido* (E2, aceptado el 18/11/2026) | No está en las fuentes. Valores típicos de lógica de 3,3 V. En la zona indefinida se mantiene la última lectura (aproxima la histéresis) |
+| Resistencia del contacto de un pulsador | 0,1 Ω (E2, aceptado el 18/11/2026) | No está en las fuentes. Pulsador suelto = circuito abierto ideal; sin rebotes |
 
 ### 2.7 Representación visual
 

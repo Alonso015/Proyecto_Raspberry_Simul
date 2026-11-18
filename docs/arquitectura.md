@@ -257,6 +257,17 @@ Implementado en `Assets/Scripts/Domain/Electrical` y `Components/Resistor.cs`, c
 | `gmin` | 1e-12 S (1 TΩ) | Error relativo de ~1e-9 en un divisor de 1 kΩ |
 | Umbral de pivote | 1e-300 | Si se alcanza, la matriz es singular y se lanza una excepción con el nodo afectado |
 
+**Etapa E2 (18/11/2026):** `GpioPin` y `PushButton` en `Components/`.
+
+| Cambio | Detalle |
+|--------|---------|
+| `IStampContext.AddConductanceTo(nodo, g, V)` | Conductancia hacia una fuente ideal interna sin nodo propio: equivalente de Norton. La usan la salida del GPIO (fuente de 3,3 V o 0 V con su resistencia interna) y las pull-up y pull-down internas |
+| `GpioPin` | Entrada de alta impedancia ideal, con pull opcional, o salida con resistencia interna. Lectura con tres estados (`Low`, `High`, `Undefined`) y "última lectura válida" en la zona indefinida |
+| Modo inicial | Entrada sin pull, como tras `GPIO.cleanup()` |
+| Pines `GpioPin` sueltos | Todavía no hay `RaspberryPi` que los agrupe; llega en E4 |
+
+Los valores numéricos son supuestos y están en requisitos.md §2.6.
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |
