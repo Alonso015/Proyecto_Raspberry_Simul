@@ -1,4 +1,4 @@
-using System.Linq;
+using ImatPiSim.Domain.Interpreter;
 using ImatPiSim.Domain.Simulation;
 using UnityEngine;
 
@@ -11,8 +11,8 @@ namespace ImatPiSim.Presentation
     /// <remarks>
     /// Es el único MonoBehaviour que conoce <see cref="SimulatorFacade"/> como "dueño". Las
     /// vistas solo leen el modelo y le pasan las acciones del ratón: no contienen lógica de
-    /// simulación. Etapa E14: el programa es fijo (se edita en el Inspector); el editor de código
-    /// dentro del juego llega en E15.
+    /// simulación. El campo <see cref="program"/> es el texto inicial del editor
+    /// (<see cref="Ui.EditorPanel"/>), que lo sustituye al pulsar Ejecutar.
     /// </remarks>
     public sealed class SimulationRunner : MonoBehaviour
     {
@@ -24,8 +24,8 @@ namespace ImatPiSim.Presentation
         public string program =
             "from gpiozero import LED, Button\n" +
             "\n" +
-            "# Tema 3: el LED D1 (GPIO20) se enciende mientras se pulsa SW1 (GPIO7).\n" +
-            "# SW4 (GPIO19) termina el programa.\n" +
+            "# Tema 3: el LED D1 (GPIO20) se enciende mientras\n" +
+            "# se pulsa SW1 (GPIO7). SW4 (GPIO19) termina.\n" +
             "def main() -> None:\n" +
             "    puls_led = Button(7)\n" +
             "    puls_fin = Button(19)\n" +
@@ -48,12 +48,10 @@ namespace ImatPiSim.Presentation
         [Tooltip("Ejecutar el programa automáticamente al darle a Play.")]
         public bool runOnStart = true;
 
-        [Tooltip("Mostrar el panel de estado (provisional, hasta la UI de E15).")]
-        public bool showStatusPanel = true;
-
         public SimulatorFacade Facade { get; private set; }
 
-        private string _loadError;
+        /// <summary>Error de la última carga (léxico o sintáctico), o <c>null</c> si el programa se cargó bien.</summary>
+        public ScriptException LoadError { get; private set; }
 
         private void Awake()
         {
@@ -68,7 +66,7 @@ namespace ImatPiSim.Presentation
         public void LoadAndRun()
         {
             var result = Facade.LoadProgram(program);
-            _loadError = result.Success ? null : result.Error.Message;
+            LoadError = result.Error;
             if (result.Success) Facade.Run();
         }
 
@@ -76,33 +74,5 @@ namespace ImatPiSim.Presentation
         {
             Facade.Tick(Mathf.Min(Time.deltaTime, MaxStep));
         }
-
-        // ------------------------------------------------------------------ panel provisional
-
-        private void OnGUI()
-        {
-            if (!showStatusPanel || Facade == null) return;
-            GUILayout.BeginArea(new Rect(10, 10, 430, Screen.height - 20), GUI.skin.box);
-            GUILayout.Label($"<b>Estado:</b> {Facade.State}   ·   t = {Facade.Time:0.0} s   ·   línea {Facade.CurrentLine}",
-                            Rich());
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Ejecutar")) LoadAndRun();
-            if (GUILayout.Button("Parar (Ctrl+C)")) Facade.Stop();
-            if (GUILayout.Button("Reiniciar")) Facade.Reset();
-            GUILayout.EndHorizontal();
-            GUILayout.Label("Pulsa SW1–SW4 con el ratón (mantén el clic para mantenerlo pulsado).");
-
-            if (_loadError != null) GUILayout.Label($"<color=#ff6060>{_loadError}</color>", Rich());
-            if (Facade.State == SimulationState.ProgramError)
-                GUILayout.Label($"<color=#ff6060>{Facade.ProgramError.Message}</color>", Rich());
-            foreach (var f in Facade.Faults) GUILayout.Label($"<color=#ffb040>⚠ {f.Message}</color>", Rich());
-
-            GUILayout.Label("<b>Salida (print):</b>", Rich());
-            foreach (var line in Facade.Output.Skip(System.Math.Max(0, Facade.Output.Count - 8)))
-                GUILayout.Label(line);
-            GUILayout.EndArea();
-        }
-
-        private static GUIStyle Rich() => new GUIStyle(GUI.skin.label) { richText = true, wordWrap = true };
     }
 }

@@ -1,5 +1,6 @@
 using System.Linq;
 using ImatPiSim.Presentation;
+using ImatPiSim.Presentation.Ui;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace ImatPiSim.EditorTools
 {
     /// <summary>
     /// Crea la escena principal (<c>Assets/Scenes/Main.unity</c>): una cámara ortográfica 2D y el
-    /// objeto "Simulador" con <see cref="SimulationRunner"/> y <see cref="BoardView"/>.
+    /// objeto "Simulador" con <see cref="SimulationRunner"/>, <see cref="BoardView"/> y <see cref="EditorPanel"/>.
     /// </summary>
     /// <remarks>
     /// Se usa desde el menú <b>IMAT Pi → Crear escena principal</b> o en modo batch:
@@ -36,6 +37,7 @@ namespace ImatPiSim.EditorTools
             var sim = new GameObject("Simulador");
             sim.AddComponent<SimulationRunner>();
             sim.AddComponent<BoardView>();
+            sim.AddComponent<EditorPanel>();
 
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             EditorSceneManager.SaveScene(scene, ScenePath);

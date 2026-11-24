@@ -27,16 +27,21 @@ namespace ImatPiSim.Presentation
         public IReadOnlyList<LedView> Leds => _leds;
         public IReadOnlyList<ButtonView> Buttons => _buttons;
 
+        /// <summary>Rectángulo que ocupa la placa en el mundo (para encuadrar la cámara).</summary>
+        public Rect Bounds => new Rect((Vector2)transform.position - BoardSize / 2, BoardSize);
+
+        private static readonly Vector2 BoardSize = new Vector2(10.4f, 6.6f);
+
         private void Start()
         {
             var facade = GetComponent<SimulationRunner>().Facade;
             var hat = facade.Hat;
             var root = new GameObject("IMAT HAT").transform;
             root.SetParent(transform, false);
-            root.localPosition = new Vector3(2.2f, 0, 0);
+            root.localPosition = Vector3.zero;   // la cámara se encuadra sola (EditorPanel.FrameCamera)
 
             // Placa y conector de 40 pines
-            SpriteFactory.Shape(root, "Borde", SpriteFactory.Square, Vector2.zero, new Vector2(10.4f, 6.6f), BoardEdge, 0);
+            SpriteFactory.Shape(root, "Borde", SpriteFactory.Square, Vector2.zero, BoardSize, BoardEdge, 0);
             SpriteFactory.Shape(root, "Placa", SpriteFactory.Square, Vector2.zero, new Vector2(10.2f, 6.4f), BoardColor, 1);
             SpriteFactory.Shape(root, "Conector 40 pines", SpriteFactory.Square, new Vector2(0, 2.85f), new Vector2(8.6f, 0.45f), HeaderColor, 2);
             SpriteFactory.Label(root, "IMAT HAT  ·  Raspberry Pi 4", new Vector2(0, 2.25f), 0.38f, Silk);

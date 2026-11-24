@@ -2,7 +2,9 @@
     "name": "ImatPiSim.Presentation",
     "rootNamespace": "ImatPiSim.Presentation",
     "references": [
-        "ImatPiSim.Domain"
+        "ImatPiSim.Domain",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

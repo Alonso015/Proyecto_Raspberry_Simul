@@ -444,6 +444,28 @@ atom       := NAME | NUMBER | STRING+ | True | False | None | '(' ... ')' | '[' 
 
 Las vistas no contienen lógica de simulación: leen el modelo y pasan las acciones a la fachada.
 
+**Etapa E15 (24/11/2026):** editor de código dentro del juego. Decidido con el alumno: uGUI + TextMeshPro, editor en el 40 % izquierdo de la pantalla, y como ayudas sangría automática, números de línea y resaltado de la línea en ejecución. El tabulador no se cambia: TextMeshPro inserta un `\t` y el lexer lo trata como Python, avanzando hasta el siguiente múltiplo de 8.
+
+| Pieza | Detalle |
+|-------|---------|
+| `SourceText` (dominio, `Interpreter`) | Cuenta líneas, da la línea de un carácter y calcula la sangría de la línea nueva al pulsar Enter, con las reglas de IDLE: misma sangría; +4 espacios si la línea acaba en `:`; −1 nivel tras `return`, `pass`, `break`, `continue` o `raise`. No tiene en cuenta los `:` y `#` que están dentro de cadenas o comentarios. Está en el dominio porque es sintaxis de Python, y así se prueba con `dotnet test` |
+| `Ui/UiFactory` | Crea en código el Canvas (Screen Space Overlay, referencia 1920 × 1080), el EventSystem (`StandaloneInputModule`, Input Manager clásico), los paneles, los textos TMP y los botones. La fuente del código es monoespaciada y se crea a partir de una fuente del sistema (Consolas, Menlo, DejaVu Sans Mono o Courier New). Si no hay ninguna, se usa LiberationSans |
+| `Ui/CodeEditorView` | `TMP_InputField` multilínea sin ajuste de línea (el campo lo activa por defecto y se desactiva después), así que la línea *n* del programa es la *n* que dibuja TMP. Los números de línea y las dos marcas (error en rojo, ejecución en amarillo) se colocan en cada `LateUpdate` con `textInfo.lineInfo` y siguen el scroll del texto. La sangría automática se aplica en `onValueChanged`: solo cuando el cambio es exactamente un `\n` escrito antes del cursor, de modo que pegar varias líneas no se altera. Al editar, la marca de error desaparece |
+| `Ui/ConsoleView` | Muestra la salida de `print`, después los errores del programa (en rojo) y los fallos eléctricos (en naranja). Va alineada abajo con máscara, como un terminal, y usa `<noparse>` para que un `print("<b>")` no se interprete como formato |
+| `Ui/EditorPanel` | Botones Ejecutar / Parar (Ctrl+C) / Reiniciar, línea de estado, editor y consola. **Ejecutar** pasa el texto a `SimulationRunner.LoadAndRun`, y este a `LoadProgram` (lexer → parser → compilador). Si falla, se marca la línea de la `ScriptException`. Si carga bien, `Run()` y el programa avanza en cada `Tick`. Lleva `[DefaultExecutionOrder(100)]` para pintar el estado del tick del mismo frame. También encuadra la cámara: la placa cabe entera en el 60 % derecho, sea cual sea la relación de aspecto |
+| `SimulationRunner` | Se retira el panel `OnGUI` provisional. `program` pasa a ser el texto inicial del editor, y `LoadError` guarda el error de la última carga |
+| TMP Essential Resources | Importados en `Assets/TextMesh Pro` (≈ 4 MB: fuente LiberationSans SDF, shaders y TMP Settings) desde el paquete `com.unity.ugui` de Unity 6000.0.85f2 |
+| Pruebas | +14 de `SourceText` (EditMode, 266 en total). +9 en modo Play (`CodeEditorTests`, 12 en total): el programa inicial y los números de línea; una línea larga no se parte; el reto 1 escrito en el editor enciende D1 y marca `pause()`; un error de sintaxis marca la línea 3 y aparece en la consola; un error de ejecución (`1 / 0`) marca su línea; editar quita la marca; Enter tras `:` sangra; Parar detiene; la placa no queda tapada por el panel |
+
+Recorrido completo, de lo que escribe el jugador a lo que se ve:
+
+1. **Texto del editor.**
+2. **Carga del programa:** `LoadProgram` pasa el texto por el lexer, el parser y el compilador, que lo convierte en iteradores de C#.
+3. **Ejecución:** en cada frame se llama a `Tick`, y la `ScriptRuntime` ejecuta pasos del programa.
+4. **Llamada a gpiozero:** `led.on()` llega a `GzDigitalOutput`, y de ahí a `IPin` y a `GpioPin` en nivel alto.
+5. **Circuito:** el solver nodal calcula la corriente por R1 y D1 (≈ 4,8 mA).
+6. **Pantalla:** `Led.Brightness` cambia, `LedView` recibe `StateChanged` y cambia el color del sprite.
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |
