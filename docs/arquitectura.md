@@ -494,6 +494,52 @@ Decisiones tomadas con el alumno el 24/11/2026. Son decisiones del simulador, no
 - **Distancias en la rejilla:** se cuentan en filas, sin tener en cuenta el canal central. Un LED de separación 1 puede cruzar de e a f.
 - **Cables y tiras:** son conductores ideales (0 Ω).
 
+**Etapa E13 (24/11/2026):** autorouter de cables con A\*, la IA del proyecto (`Assets/Scripts/Domain/Wiring/Routing`).
+
+Decisiones tomadas con el alumno el 24/11/2026:
+
+- **Qué traza:** el A* traza solo los cables de agujero a agujero dentro de la protoboard. Los cables entre la HAT y la protoboard son Dupont "al aire" y no se trazan.
+- **Costes:** 1 por agujero recorrido, +1 por giro y +5 por cada cable o cuerpo de componente que se cruza.
+- **Agujeros ocupados:** no se pueden atravesar.
+
+| Pieza | Detalle |
+|-------|---------|
+| `RoutingGrid` | **Lo que la IA sabe del entorno (R8).** Es una rejilla de 14 × 30 en la que cada casilla indica si está ocupada (hay una patilla o el extremo de un cable) y su carga (cuántos cables o cuerpos de componente pasan ya por encima). `FromCircuit` la construye a partir del modelo lógico. No usa nada de la escena de Unity: ni sprites ni posiciones en pantalla. `Render` la dibuja en texto |
+| `RoutingCosts` | `StepCost` calcula el coste de un paso: paso + giro si cambia de dirección + cruce × carga. El destino no cuenta como cruce. `Evaluate` calcula el coste de un camino entero e indica si no es válido |
+| `IRouter` (Strategy) | `FindRoute(grid, desde, hasta)` devuelve un `Route` con las casillas, el coste, los giros y los estados expandidos. Si no hay camino, el resultado está vacío. El juego pide un camino sin saber qué algoritmo lo calcula |
+| `AStarRouter` | El estado es **(casilla, dirección de llegada)**, porque los giros cuestan. La heurística es `h = paso · Manhattan`. Usa un montículo binario propio, ya que .NET Standard 2.1 no trae `PriorityQueue`. A igual `f`, desempata por mayor `g` y luego por orden de llegada, para que el resultado sea siempre el mismo |
+| `LRouter` | Prueba las dos L posibles (primero en horizontal o primero en vertical) y elige la más barata. Sirve para comparar: no rodea obstáculos |
+| `Wire.Route`, `Circuit.RouteWire` | El cable guarda los agujeros por los que pasa. `RouteWire("d4", "d10", router)` construye la rejilla, pide el camino y tiende el cable. `AddWire(a, b, route)` valida el recorrido: que vaya de un extremo al otro, paso a paso y sin atravesar agujeros ocupados. El recorrido no cambia nada eléctrico, porque el cable sigue siendo ideal |
+| Pruebas | 17 nuevas (`RouterTests`, 322 en total). Ver los resultados más abajo |
+
+Resultados de las pruebas:
+
+- **Casos calculados a mano:**
+  - una línea recta cuesta 4;
+  - una diagonal cuesta 7 con un solo giro;
+  - rodear un muro cuesta 16, y la L no lo consigue;
+  - cruzar un cable (7) sale más barato que rodear (8), pero rodear (6) sale más barato que cruzar (7) cuando el hueco está cerca.
+- **Sin camino:** el resultado queda vacío. También cuando un extremo está ocupado o fuera de la rejilla.
+- **La heurística no sobreestima:** se comprueba en más de 500 casillas de caminos óptimos.
+- **A* da el óptimo:** en 300 rejillas al azar, A* da el mismo coste que una búsqueda exhaustiva (Dijkstra) escrita aparte, y expande la mitad de estados: 15 592 frente a 29 619.
+- **La L frente al A*:** de 200 casos, la L no encuentra camino en 98 y en otros 22 lo encuentra más caro.
+- **En la protoboard:**
+  - rodea las patillas y el cuerpo de una resistencia;
+  - un segundo cable cruza el primero cuando rodear sale más caro (10 frente a 13);
+  - un puente trazado conduce como cualquier otro cable en el reto 4.
+
+**Por qué A* encuentra el óptimo:**
+
+1. `f(n) = g(n) + h(n)` y `h` es admisible, así que `f(n)` nunca supera el coste del mejor camino que pasa por `n`.
+2. Mientras quede en la frontera un estado de un camino mejor, su `f` es menor que el coste de cualquier camino peor que llegue al destino, y se expande antes.
+3. Por tanto, el primer camino que sale de la frontera en el destino es óptimo.
+4. Además, `h` es **consistente**: cada paso cuesta al menos 1 y cambia la distancia Manhattan como mucho en 1. Por eso se puede cerrar un estado al expandirlo sin tener que reabrirlo.
+
+**Aproximaciones:**
+
+- Los cables van por la rejilla en horizontal y vertical, nunca en diagonal.
+- Pasar por encima del cuerpo de un componente cuenta como un cruce.
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |

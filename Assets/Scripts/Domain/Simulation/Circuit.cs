@@ -4,6 +4,7 @@ using System.Linq;
 using ImatPiSim.Domain.Components;
 using ImatPiSim.Domain.Electrical;
 using ImatPiSim.Domain.Wiring;
+using ImatPiSim.Domain.Wiring.Routing;
 
 namespace ImatPiSim.Domain.Simulation
 {
@@ -152,15 +153,17 @@ namespace ImatPiSim.Domain.Simulation
         /// Tiende un cable entre dos puntos de conexión: agujeros de la protoboard, pines de los
         /// conectores de la HAT o patillas de componentes que no se pinchan (el servo).
         /// </summary>
-        /// <exception cref="AssemblyException">Algún extremo no admite cables o ya tiene uno.</exception>
-        public Wire AddWire(Pin a, Pin b)
+        /// <param name="route">Recorrido por la protoboard, de A a B (opcional; ver <see cref="RouteWire"/>).</param>
+        /// <exception cref="AssemblyException">Algún extremo no admite cables o ya tiene uno, o el recorrido no es válido.</exception>
+        public Wire AddWire(Pin a, Pin b, IReadOnlyList<HoleId> route = null)
         {
             if (a == null || b == null) throw new ArgumentNullException(a == null ? nameof(a) : nameof(b));
             if (a == b) throw new AssemblyException("Los dos extremos del cable son el mismo punto.");
             CheckWireEnd(a);
             CheckWireEnd(b);
+            if (route != null && route.Count > 0) CheckRoute(a, b, route);
 
-            var wire = new Wire("W" + _nextWire++, a, b);
+            var wire = new Wire("W" + _nextWire++, a, b, route);
             _wires.Add(wire);
             Occupy(a, wire);
             Occupy(b, wire);
@@ -170,6 +173,44 @@ namespace ImatPiSim.Domain.Simulation
 
         /// <summary>Cable entre dos agujeros o pines dados por su nombre: "a10", "T+3", "J7.1"...</summary>
         public Wire AddWire(string a, string b) => AddWire(PinByName(a), PinByName(b));
+
+        /// <summary>
+        /// Tiende un cable entre dos agujeros de la protoboard con el recorrido que calcule
+        /// <paramref name="router"/> (el A*, normalmente) sobre el estado actual del montaje.
+        /// </summary>
+        /// <exception cref="AssemblyException">Algún extremo no es un agujero libre, o no hay camino.</exception>
+        public Wire RouteWire(string a, string b, IRouter router)
+        {
+            if (router == null) throw new ArgumentNullException(nameof(router));
+            var pa = PinByName(a);
+            var pb = PinByName(b);
+            var ha = Breadboard?.HoleOf(pa);
+            var hb = Breadboard?.HoleOf(pb);
+            if (!ha.HasValue || !hb.HasValue)
+                throw new AssemblyException("Solo se trazan cables entre agujeros de la protoboard; a la HAT van al aire.");
+            CheckWireEnd(pa);
+            CheckWireEnd(pb);
+
+            var route = router.FindRoute(RoutingGrid.FromCircuit(this), Cell.FromHole(ha.Value), Cell.FromHole(hb.Value));
+            if (!route.Found) throw new AssemblyException($"No hay camino libre de {a} a {b}.");
+            return AddWire(pa, pb, route.Cells.Select(c => c.ToHole()).ToList());
+        }
+
+        /// <summary>El recorrido va de un extremo al otro, paso a paso, sin atravesar agujeros ocupados.</summary>
+        private void CheckRoute(Pin a, Pin b, IReadOnlyList<HoleId> route)
+        {
+            var ha = Breadboard?.HoleOf(a);
+            var hb = Breadboard?.HoleOf(b);
+            if (!ha.HasValue || !hb.HasValue || route[0] != ha.Value || route[route.Count - 1] != hb.Value)
+                throw new AssemblyException("El recorrido del cable debe empezar y terminar en sus dos agujeros.");
+            for (int i = 1; i < route.Count; i++)
+            {
+                if (Cell.FromHole(route[i - 1]).ManhattanTo(Cell.FromHole(route[i])) != 1)
+                    throw new AssemblyException($"El recorrido salta de {route[i - 1]} a {route[i]}.");
+                if (i < route.Count - 1 && Breadboard.Occupant(route[i]) != null)
+                    throw new AssemblyException($"El recorrido atraviesa el agujero ocupado {route[i]}.");
+            }
+        }
 
         public void RemoveWire(Wire wire)
         {

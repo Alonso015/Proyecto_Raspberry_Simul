@@ -9,16 +9,23 @@ namespace ImatPiSim.Domain.Wiring
     /// </summary>
     public sealed class Wire
     {
-        internal Wire(string id, Pin a, Pin b)
+        internal Wire(string id, Pin a, Pin b, IReadOnlyList<HoleId> route)
         {
             Id = id;
             A = a;
             B = b;
+            Route = route ?? System.Array.Empty<HoleId>();
         }
 
         public string Id { get; }
         public Pin A { get; }
         public Pin B { get; }
+
+        /// <summary>
+        /// Agujeros por los que pasa el cable, de A a B (incluidos los dos extremos), si se ha
+        /// trazado por la protoboard (A*, etapa E13). Vacío para un cable "al aire" (Dupont a la HAT).
+        /// </summary>
+        public IReadOnlyList<HoleId> Route { get; }
 
         public override string ToString() => $"{Id}: {A.FullName} — {B.FullName}";
     }
