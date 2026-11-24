@@ -366,11 +366,29 @@ atom       := NAME | NUMBER | STRING+ | True | False | None | '(' ... ')' | '[' 
 - En E8, el botón **Parar** del simulador lanzará `KeyboardInterrupt`, como Ctrl+C.
 - No soportado: `raise`, `except (A, B)` y el `else` de un `try`.
 
+**Etapa E8 (18/11/2026):** ejecución cooperativa, en `Interpreter/Runtime/`.
+
+**Decidido (18/11/2026): opción A, recorrer el árbol con iteradores de C#.** Se descartó el bytecode (opción B): costaba bastante más trabajo (compilador, máquina virtual, tabla de manejadores para `try`) y ningún reto necesita su precisión. La opción A es el patrón **Interpreter** sobre el Composite del árbol.
+
+| Pieza | Detalle |
+|-------|---------|
+| `Compiler : IAstVisitor<Executable>` | Visitor que, al cargar, convierte cada nodo en un delegado `Executable(Frame, Ref)` que es un iterador. Cada sentencia emite `Signal.Step` (consume presupuesto) y `sleep` emite `Signal.Sleep(s)`. Al reanudar, el iterador sigue exactamente donde estaba, aunque sea dentro de un bucle de una función llamada desde una expresión |
+| `try` en iteradores | C# no permite `yield` dentro de un `try` con `catch`. El cuerpo protegido se recorre a mano (`Protected`): el `catch` envuelve solo a `MoveNext()`. El `finally` se ejecuta siempre, también tras `return` o `break` |
+| `ScriptRuntime` | Planificador: `Load` (analiza y compila), `Start`, `Tick(dt)` (avanza el tiempo simulado y ejecuta hasta `StepsPerTick` = 1000 pasos), `Stop`, `EnqueueCall` (callbacks), `State`, `Error`, `CurrentLine`, `Output` y `LineWritten` |
+| Tareas | El programa principal y cada callback son tareas; los callbacks se ejecutan intercalados y antes que el principal en cada tick. Una tarea dormida se aparca hasta su hora de despertar |
+| Parar = Ctrl+C | `Stop()` despierta al principal y le entrega `KeyboardInterrupt` en la siguiente sentencia (o al volver de `sleep` o `pause`). Los callbacks se descartan. Un segundo `Stop()` mata el programa aunque ignore la interrupción |
+| Ámbitos (`Scope`, `Frame`) | Reglas de Python: lo que se asigna dentro de una función es local salvo `global` o `nonlocal`; cierres para funciones anidadas y lambdas; `UnboundLocalError` como en Python |
+| Valores | int → `long`, float → `double`, bool, str, None → `null`, `PyList`, `PyTuple`, `PyRange`, `PyFunction`, `NativeFunction`/`NativeCoroutine`, `PyModule` |
+| `PyOps` | Semántica de los operadores: `/` siempre da decimal; `//` y `%` redondean hacia −∞; los bits solo con enteros; `str`/`repr` como Python (`0.30000000000000004`, `2.0`, `1e-05`) |
+| Funciones integradas | `print` (con `sep` y `end`), `range`, `len`, `int`, `float`, `str`, `bool`, `abs`, `min`, `max`, `round` (redondeo bancario), `sum`, `list`, `tuple` y `reversed`. Métodos de lista: `append`, `insert`, `pop`, `remove`, `clear`, `index`, `count` y `reverse` |
+| Módulos | `time` (`sleep`; `time` y `monotonic` devuelven el tiempo simulado) y `signal` (`pause`). `gpiozero` llega en E9. `RPi.GPIO` da un error que sugiere usar gpiozero |
+| Errores | `PyException` lleva el tipo de Python, el mensaje en castellano y la posición más interna; si no se captura, se convierte en `ScriptRuntimeException`. Jerarquía para `except` (p. ej. `ZeroDivisionError` ⊂ `ArithmeticError` ⊂ `Exception`; `KeyboardInterrupt` no está dentro de `Exception`). Errores al cargar: `return` o `break` fuera de lugar, `nonlocal` en el módulo y tipo de excepción desconocido |
+| Límites | `MaxCallDepth` = 100 (`RecursionError`); enteros de 64 bits (`OverflowError` si se desbordan) |
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |
 |----------|----------|----------|
-| Cómo pausar y reanudar el programa del jugador (cooperativo) | (a) Evaluador del AST con iteradores de C# (`IEnumerator`, como las corrutinas de Unity); (b) compilar el AST a bytecode para una pequeña máquina de pila | Diagrama de clases del intérprete |
 | Datos de los retos | `ScriptableObject` editables en Unity, o archivos JSON | Retos, Factory |
 
 ## 8. Estructura del repositorio y pruebas
