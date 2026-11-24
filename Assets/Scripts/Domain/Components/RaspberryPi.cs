@@ -75,10 +75,13 @@ namespace ImatPiSim.Domain.Components
             foreach (var g in _gpio) yield return g;
         }
 
+        /// <summary>
+        /// Repone los GPIO. La configuración de la Pi (<see cref="SpiEnabled"/>, como en
+        /// <c>raspi-config</c>) se mantiene: no cambia al relanzar un programa.
+        /// </summary>
         public override void Reset()
         {
             foreach (var g in _gpio) g.Reset();
-            SpiEnabled = false;
         }
     }
 }

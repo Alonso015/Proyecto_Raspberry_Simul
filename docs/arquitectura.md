@@ -410,6 +410,25 @@ atom       := NAME | NUMBER | STRING+ | True | False | None | '(' ... ')' | '[' 
 | `PyException.RegisterType` | Para las excepciones propias de gpiozero |
 | `PyOps.FormatFloat` sin `ToString("R")` | Busca a mano la representación más corta que, leída de vuelta, da el mismo número. El Mono de Unity y .NET daban resultados distintos (`0.89999999999999991` frente a `0.8999999999999999`); lo detectó el Test Runner de Unity |
 
+**Etapa E10 (24/11/2026):** motor de simulación y fachada, en `Assets/Scripts/Domain/Simulation/`.
+
+| Pieza | Detalle |
+|-------|---------|
+| `Circuit` | El montaje: Pi, IMAT HAT opcional, componentes externos y cables entre pines. `Version` cambia con la estructura; `BuildNetlist()` crea la netlist |
+| `SimulationEngine` | El tick de §3: programa → circuito (solo si algo cambió) → flancos → comportamiento → fallos → eventos. Estados: `Idle`, `Running`, `Finished`, `Stopped`, `ProgramError` y `Faulted` |
+| "Solo si algo cambió" | Firma = suma de `GpioPin.Version` (cada escritura o configuración del programa la incrementa) más `Invalidate()` (pulsar un botón, girar RV1, un fallo nuevo) más cambios de estructura. Sin cambios, no se resuelve |
+| Fallos | Un fallo nuevo (deduplicado por tipo y origen) emite `FaultDetected`, aborta el programa (`ScriptRuntime.Abort`) y pasa a `Faulted`. El juego decidirá en E11 si es derrota |
+| Fin del programa | Se liberan sus pines, como hace gpiozero al salir de Python: los LED se apagan |
+| `SimulatorFacade` | **Facade** para la UI. Programa: `LoadProgram` → `LoadResult`, `Run`, `Stop`, `Reset`, `Tick`. Interacción: `PressButton`/`ReleaseButton`, `SetPotentiometer`, `SetSpiEnabled`. Lectura: `LedBrightness`, `IsLedBurnt`, `State`, `Output`, `Faults`, `CurrentLine` y `ProgramError`. Eventos (Observer): `StateChanged`, `FaultDetected`, `OutputLine` y `Ticked` |
+
+**Cambios en capas anteriores:**
+
+| Cambio | Detalle |
+|--------|---------|
+| `GpioPin.Version` | Contador de cambios |
+| `ScriptRuntime.Abort()` | Detiene el programa sin `KeyboardInterrupt` |
+| `RaspberryPi.Reset()` ya no desactiva el SPI | Es configuración de la Pi (`raspi-config`), no del programa |
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |

@@ -141,6 +141,15 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
         }
 
         /// <summary>
+        /// Termina el programa al instante, sin <c>KeyboardInterrupt</c> ni <c>finally</c> (p. ej. cuando
+        /// el circuito falla y la Raspberry Pi "se apaga").
+        /// </summary>
+        public void Abort()
+        {
+            if (State == RuntimeState.Running) Kill(RuntimeState.Stopped);
+        }
+
+        /// <summary>
         /// Encola una llamada a una función del programa (p. ej. un callback <c>when_pressed</c>). Se
         /// ejecutará como una tarea aparte, intercalada con el programa principal.
         /// </summary>

@@ -112,6 +112,12 @@ namespace ImatPiSim.Domain.Components
         /// </summary>
         public bool IsInUse { get; private set; }
 
+        /// <summary>
+        /// Se incrementa cada vez que el programa cambia la configuración o la salida del pin. El
+        /// motor de simulación lo usa para saber si hay que volver a resolver el circuito.
+        /// </summary>
+        public int Version { get; private set; }
+
         /// <summary>Señal que genera el pin en modo <see cref="PinMode.Pwm"/>; <c>null</c> en otro caso.</summary>
         public PwmSignal Pwm { get; private set; }
 
@@ -141,6 +147,7 @@ namespace ImatPiSim.Domain.Components
             Pull = pull;
             Pwm = null;
             IsInUse = true;
+            Version++;
 
             // En la placa real la pull actúa al instante. Aquí la tensión del pin no se conoce hasta
             // la siguiente resolución del circuito, así que, mientras tanto, se lee el nivel que
@@ -160,6 +167,7 @@ namespace ImatPiSim.Domain.Components
             OutputLevel = initialLevel;
             Pwm = null;
             IsInUse = true;
+            Version++;
         }
 
         /// <summary>Configura el pin como salida PWM (como <c>PWMLED</c> o <c>AngularServo</c>).</summary>
@@ -169,6 +177,7 @@ namespace ImatPiSim.Domain.Components
             Pull = PullMode.None;
             Pwm = new PwmSignal(frequency, dutyCycle);
             IsInUse = true;
+            Version++;
         }
 
         /// <summary>Cambia el factor de servicio manteniendo la frecuencia.</summary>
@@ -176,6 +185,7 @@ namespace ImatPiSim.Domain.Components
         {
             if (Mode != PinMode.Pwm) throw new InvalidOperationException($"GPIO{Bcm} no está en modo PWM.");
             Pwm = new PwmSignal(Pwm.Frequency, dutyCycle);
+            Version++;
         }
 
         /// <summary>Escribe un nivel (como <c>GPIO.output</c> o <c>led.on()</c>).</summary>
@@ -184,6 +194,7 @@ namespace ImatPiSim.Domain.Components
         {
             if (Mode != PinMode.Output)
                 throw new InvalidOperationException($"GPIO{Bcm} no está configurado como salida.");
+            if (OutputLevel != level) Version++;
             OutputLevel = level;
         }
 
@@ -254,6 +265,7 @@ namespace ImatPiSim.Domain.Components
         /// </summary>
         public void Release()
         {
+            Version++;
             Mode = PinMode.Input;
             Pull = PullMode.None;
             OutputLevel = false;
@@ -264,6 +276,7 @@ namespace ImatPiSim.Domain.Components
         /// <summary>Repone el pin: entrada sin pull y sin daños (nuevo intento del reto).</summary>
         public void Reset()
         {
+            Version++;
             _faults.Clear();
             Mode = PinMode.Input;
             Pull = PullMode.None;
