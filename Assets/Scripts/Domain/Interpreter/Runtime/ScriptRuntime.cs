@@ -53,6 +53,7 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
         private bool _interruptRequested;
         private bool _interruptDelivered;
         private int _depth;
+        private long _tickId;
 
         public ScriptRuntime()
         {
@@ -132,7 +133,11 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
             _interruptRequested = true;
             _pendingCalls.Clear();
             _tasks.RemoveAll(t => !t.IsMain);       // los callbacks no siguen tras Ctrl+C
-            foreach (var t in _tasks) t.WakeAt = Time; // despierta al principal si estaba dormido
+            foreach (var t in _tasks)
+            {
+                t.WakeAt = Time;        // despierta al principal si estaba dormido...
+                t.SleptAtTick = -1;     // ...también si se durmió en el tick actual
+            }
         }
 
         /// <summary>
@@ -145,6 +150,19 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
             if (State == RuntimeState.Running && !_interruptRequested) _pendingCalls.Enqueue((function, args ?? new object[0]));
         }
 
+        /// <summary>
+        /// Arranca una tarea de fondo del propio simulador (p. ej. el parpadeo de <c>led.blink()</c>),
+        /// que se ejecuta intercalada con el programa como un callback más.
+        /// </summary>
+        public BackgroundTask StartBackground(string name, IEnumerable<Signal> steps)
+        {
+            if (steps == null) throw new ArgumentNullException(nameof(steps));
+            var task = new ScriptTask(name, false, steps.GetEnumerator());
+            if (State == RuntimeState.Running) _tasks.Add(task);
+            else task.Done = true;
+            return new BackgroundTask(task);
+        }
+
         /// <summary>Avanza <paramref name="dt"/> segundos de tiempo simulado y ejecuta lo que toque.</summary>
         public void Tick(double dt)
         {
@@ -152,6 +170,7 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
             StepsLastTick = 0;
             if (State != RuntimeState.Running) return;
             Time += dt;
+            _tickId++;
 
             while (_pendingCalls.Count > 0)
             {
@@ -170,7 +189,9 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
                 foreach (var task in _tasks.ToArray())
                 {
                     if (State != RuntimeState.Running || budget <= 0) break;
-                    if (task.Done || task.WakeAt > Time + TimeEpsilon) continue;
+                    // Una tarea que se ha dormido en este tick no vuelve a ejecutarse hasta el siguiente,
+                    // aunque su espera sea 0: así sleep(0) o esperar a un pulsador no acaparan el tick.
+                    if (task.Done || task.WakeAt > Time + TimeEpsilon || task.SleptAtTick == _tickId) continue;
                     budget -= RunTask(task, budget, ref progressed);
                 }
                 _tasks.RemoveAll(t => t.Done);
@@ -209,6 +230,7 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
                     if (signal.IsSleep)
                     {
                         task.WakeAt = Time + signal.Seconds;
+                        task.SleptAtTick = _tickId;
                         progressed = true;
                         return used;
                     }
@@ -402,7 +424,20 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
             public bool IsMain { get; }
             public IEnumerator<Signal> Steps { get; }
             public double WakeAt { get; set; }
+            public long SleptAtTick { get; set; } = -1;
             public bool Done { get; set; }
+        }
+
+        /// <summary>Referencia a una tarea de fondo para poder cancelarla.</summary>
+        public sealed class BackgroundTask
+        {
+            private readonly ScriptTask _task;
+            internal BackgroundTask(object task) => _task = (ScriptTask)task;
+
+            public bool IsRunning => !_task.Done;
+
+            /// <summary>Cancela la tarea; deja de ejecutarse desde el siguiente paso.</summary>
+            public void Cancel() => _task.Done = true;
         }
     }
 }

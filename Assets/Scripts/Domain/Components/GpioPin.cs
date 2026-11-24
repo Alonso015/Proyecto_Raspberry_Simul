@@ -136,10 +136,21 @@ namespace ImatPiSim.Domain.Components
 
         public void ConfigureAsInput(PullMode pull = PullMode.None)
         {
+            bool pullChanged = Mode != PinMode.Input || Pull != pull;
             Mode = PinMode.Input;
             Pull = pull;
             Pwm = null;
             IsInUse = true;
+
+            // En la placa real la pull actúa al instante. Aquí la tensión del pin no se conoce hasta
+            // la siguiente resolución del circuito, así que, mientras tanto, se lee el nivel que
+            // impone la pull (si un pulsador ya pulsado lo contradice, la próxima resolución lo
+            // corrige). Sin esto, un Button recién creado leería "pulsado" con la tensión vieja.
+            if (pullChanged && pull != PullMode.None)
+            {
+                Level = pull == PullMode.Up ? InputLevel.High : InputLevel.Low;
+                _lastReadLevel = pull == PullMode.Up;
+            }
         }
 
         public void ConfigureAsOutput(bool initialLevel = false)
@@ -236,6 +247,19 @@ namespace ImatPiSim.Domain.Components
         }
 
         public IEnumerable<Fault> CheckFaults() => _faults;
+
+        /// <summary>
+        /// Libera el pin (como <c>close()</c> en gpiozero): vuelve a ser una entrada sin pull y deja
+        /// de estar en uso. A diferencia de <see cref="Reset"/>, no borra los daños.
+        /// </summary>
+        public void Release()
+        {
+            Mode = PinMode.Input;
+            Pull = PullMode.None;
+            OutputLevel = false;
+            Pwm = null;
+            IsInUse = false;
+        }
 
         /// <summary>Repone el pin: entrada sin pull y sin daños (nuevo intento del reto).</summary>
         public void Reset()

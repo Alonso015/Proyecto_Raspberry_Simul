@@ -46,6 +46,23 @@ namespace ImatPiSim.Domain.Tests.Interpreter
             Assert.That(Out(rt), Is.EqualTo("0.30000000000000004 2.0 True None a [1, 'b', 2.5] (7,) 1e-05"));
         }
 
+        [TestCase(0.1, "0.1")]
+        [TestCase(0.3 * 3, "0.8999999999999999")]
+        [TestCase(2.0, "2.0")]
+        [TestCase(-1.5, "-1.5")]
+        [TestCase(1e-5, "1e-05")]
+        [TestCase(0.0001, "0.0001")]
+        [TestCase(123456.789, "123456.789")]
+        [TestCase(1e16, "1e+16")]
+        [TestCase(1.5e16, "1.5e+16")]
+        [TestCase(1e15, "1000000000000000.0")]
+        [TestCase(0.0, "0.0")]
+        [TestCase(3.3 / 1023, "0.0032258064516129032")]
+        public void FormatoDeDecimales_ComoPython_IgualEnUnityYEnDotnet(double value, string expected)
+        {
+            Assert.That(PyOps.FormatFloat(value), Is.EqualTo(expected));
+        }
+
         [Test]
         public void BitsDeUnContador_Practica3()
         {

@@ -36,6 +36,9 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
 
         public int ParameterCount => _paramNames.Length;
 
+        /// <summary>Parámetros sin valor por defecto.</summary>
+        public int RequiredParameterCount => _defaults.Count(d => d == NoDefault);
+
         public IEnumerable<Signal> Call(ScriptRuntime runtime, object[] args, IReadOnlyDictionary<string, object> kwargs, Ref result)
         {
             var frame = new Frame(Scope, Closure.Scope.IsModule ? null : Closure, Closure.Globals);

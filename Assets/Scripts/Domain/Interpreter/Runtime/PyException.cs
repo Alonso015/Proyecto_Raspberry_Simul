@@ -56,6 +56,15 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
 
         public static bool IsKnownType(string name) => name == "BaseException" || Parent.ContainsKey(name);
 
+        /// <summary>Añade un tipo de excepción a la jerarquía (p. ej. <c>GPIOPinInUse</c> de gpiozero).</summary>
+        public static void RegisterType(string name, string parent = "Exception")
+        {
+            lock (Parent)
+            {
+                if (!Parent.ContainsKey(name)) Parent[name] = parent;
+            }
+        }
+
         /// <summary>¿Captura un <c>except <paramref name="handlerType"/></c> esta excepción?</summary>
         public bool IsInstanceOf(string handlerType)
         {

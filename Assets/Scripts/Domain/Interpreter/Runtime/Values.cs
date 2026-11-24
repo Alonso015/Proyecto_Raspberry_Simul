@@ -50,6 +50,13 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
         void SetAttribute(string name, object value);
     }
 
+    /// <summary>Objeto que admite <c>obj[i]</c>, <c>len(obj)</c> y <c>for x in obj</c> (p. ej. <c>LEDBoard</c>).</summary>
+    public interface IPyIndexable
+    {
+        int Count { get; }
+        object GetItem(int index);
+    }
+
     /// <summary>Algo que se puede llamar con <c>(...)</c>: funciones del jugador, integradas, clases de la API.</summary>
     public interface IPyCallable
     {

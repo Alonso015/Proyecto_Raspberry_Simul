@@ -385,6 +385,31 @@ atom       := NAME | NUMBER | STRING+ | True | False | None | '(' ... ')' | '[' 
 | Errores | `PyException` lleva el tipo de Python, el mensaje en castellano y la posición más interna; si no se captura, se convierte en `ScriptRuntimeException`. Jerarquía para `except` (p. ej. `ZeroDivisionError` ⊂ `ArithmeticError` ⊂ `Exception`; `KeyboardInterrupt` no está dentro de `Exception`). Errores al cargar: `return` o `break` fuera de lugar, `nonlocal` en el módulo y tipo de excepción desconocido |
 | Límites | `MaxCallDepth` = 100 (`RecursionError`); enteros de 64 bits (`OverflowError` si se desbordan) |
 
+**Etapa E9 (24/11/2026):** API gpiozero simulada, en `Assets/Scripts/Domain/Api/`.
+
+| Pieza | Detalle |
+|-------|---------|
+| **Bridge** | Abstracción: las clases de la API (`GzDigitalOutput`, `GzPwmOutput`, `GzLedBoard`, `GzDigitalInput`, `GzServo`, `GzMcp3008`). Implementación: `IPin` / `IPinFactory`. Implementación concreta: `SimulatedPinFactory`, que maneja los `GpioPin` del modelo eléctrico. Es lo mismo que la `pin_factory` real de gpiozero. Los tests usan una segunda implementación (`FakePinFactory`) para probar la API sin circuito |
+| Clases | `LED`, `OutputDevice`/`DigitalOutputDevice`, `PWMLED`/`PWMOutputDevice` (100 Hz por defecto), `LEDBoard` (índices, `len`, `for`, `value` como tupla), `Button`, `InputDevice`, `Servo`, `AngularServo` (1–2 ms por defecto, como gpiozero) y `MCP3008`. Además `gpiozero.pins.pigpio.PiGPIOFactory`, que se acepta y no hace nada |
+| Pines | Admite `20`, `"GPIO20"`, `"BCM20"` y `"BOARD38"` (pin físico → BCM con la tabla de hardware.md §1.3). Un pin solo puede tener un dueño (`GPIOPinInUse`); `close()` lo libera |
+| Flancos y callbacks | `SimulatedPinFactory.Poll()`, tras cada resolución del circuito, compara el nivel de cada entrada con el anterior y avisa al dispositivo. `Button` encola `when_pressed`/`when_released` en el intérprete. Como en gpiozero, el callback recibe el dispositivo si tiene un parámetro obligatorio |
+| `blink` | Tarea de fondo del intérprete (`ScriptRuntime.StartBackground`); `on()`, `off()` o `toggle()` la cancelan |
+| `wait_for_press` | Espera cooperativa: comprueba en cada tick, con `timeout` opcional |
+| Errores propios | Tipos `GPIOZeroError`, `GPIOPinInUse`, `PinInvalidPin`, `PinInvalidState`, `OutputDeviceBadValue`, `GPIODeviceClosed` y `SPIError` en la jerarquía (todos son `Exception`) |
+| Orden de un paso | El programa ejecuta su tick → se resuelve el circuito → `Poll()` (flancos y callbacks) → comportamiento (servo). En E10 lo hará el motor de simulación |
+
+**Cambios en capas anteriores:**
+
+| Cambio | Motivo |
+|--------|--------|
+| `GpioPin.ConfigureAsInput` fija una lectura provisional según la pull | La tensión real no se conoce hasta la siguiente resolución. Sin esto, un `Button` recién creado leía "pulsado" con la tensión vieja, cuando el pin aún flotaba a 0 V. Aproximación: si un pulsador ya está pulsado al configurar, se ve en la resolución siguiente |
+| `GpioPin.Release()` | `close()` libera el pin sin borrar sus daños |
+| Una tarea que duerme no se reanuda en el mismo tick | Evita que `sleep(0)` o una espera activa acaparen el tick |
+| `IPyIndexable` | `LEDBoard` admite índices, `len` y `for` |
+| `PyFunction.RequiredParameterCount` | Para saber si un callback recibe el dispositivo |
+| `PyException.RegisterType` | Para las excepciones propias de gpiozero |
+| `PyOps.FormatFloat` sin `ToString("R")` | Busca a mano la representación más corta que, leída de vuelta, da el mismo número. El Mono de Unity y .NET daban resultados distintos (`0.89999999999999991` frente a `0.8999999999999999`); lo detectó el Test Runner de Unity |
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |

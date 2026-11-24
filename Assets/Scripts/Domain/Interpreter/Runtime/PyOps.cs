@@ -273,6 +273,7 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
                 case PyList l: return l.Items.ToArray();   // copia: modificar la lista dentro del for no rompe el recorrido
                 case PyTuple t: return t.Items;
                 case PyRange r: return r.Values();
+                case IPyIndexable ix: return Enumerable.Range(0, ix.Count).Select(ix.GetItem).ToArray();
                 case string s: return s.Select(c => (object)c.ToString());
                 case IEnumerable<object> e when !(v is IPyObject): return e;
                 default: throw PyException.TypeError($"'{TypeName(v)}' no se puede recorrer");
@@ -287,6 +288,7 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
                 case PyList l: return l.Items.Count;
                 case PyTuple t: return t.Items.Count;
                 case PyRange r: return r.Count;
+                case IPyIndexable ix: return ix.Count;
                 default: throw PyException.TypeError($"'{TypeName(v)}' no tiene longitud");
             }
         }
@@ -317,6 +319,7 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
                 case string s: return s[NormalizeIndex(ToIndex(index), s.Length)].ToString();
                 case PyRange r:
                     return r.Start + NormalizeIndex(ToIndex(index), (int)r.Count) * r.StepValue;
+                case IPyIndexable ix: return ix.GetItem(NormalizeIndex(ToIndex(index), ix.Count));
                 default: throw PyException.TypeError($"'{TypeName(target)}' no admite índices");
             }
         }
@@ -390,18 +393,43 @@ namespace ImatPiSim.Domain.Interpreter.Runtime
             if (double.IsNaN(d)) return "nan";
             if (double.IsPositiveInfinity(d)) return "inf";
             if (double.IsNegativeInfinity(d)) return "-inf";
-            string s = d.ToString("R", Inv).Replace("E", "e");
-            if (s.Contains("e"))
+            if (d == 0) return 1 / d < 0 ? "-0.0" : "0.0";
+
+            // Python escribe la representación MÁS CORTA que, leída de vuelta, da el mismo double.
+            // No se usa ToString("R") porque el Mono de Unity y .NET no dan el mismo resultado
+            // (0.89999999999999991 frente a 0.8999999999999999): se buscan los dígitos a mano.
+            string sci = null;
+            for (int p = 1; p <= 17; p++)
             {
-                // Python: 1e-05, 1e+16
-                int e = s.IndexOf('e');
-                string mant = s.Substring(0, e), exp = s.Substring(e + 1);
-                char sign = exp[0] == '-' ? '-' : '+';
-                exp = exp.TrimStart('+', '-').TrimStart('0');
-                if (exp.Length < 2) exp = exp.PadLeft(2, '0');
-                return mant + "e" + sign + exp;
+                sci = d.ToString("E" + (p - 1), Inv);   // p dígitos significativos: "-8.99E-001"
+                if (double.Parse(sci, NumberStyles.Float, Inv) == d) break;
             }
-            return s.Contains(".") ? s : s + ".0";
+
+            bool negative = sci[0] == '-';
+            if (negative) sci = sci.Substring(1);
+            int ePos = sci.IndexOf('E');
+            string digits = sci.Substring(0, ePos).Replace(".", "").TrimEnd('0');
+            if (digits.Length == 0) digits = "0";
+            int exp = int.Parse(sci.Substring(ePos + 1), NumberStyles.AllowLeadingSign, Inv);
+
+            string body;
+            if (exp < -4 || exp >= 16)
+            {
+                // Notación científica, como Python: 1e-05, 1.5e+16
+                body = digits.Substring(0, 1) + (digits.Length > 1 ? "." + digits.Substring(1) : "") +
+                       "e" + (exp < 0 ? "-" : "+") + Math.Abs(exp).ToString("00", Inv);
+            }
+            else if (exp >= 0)
+            {
+                string intPart = digits.Length > exp + 1 ? digits.Substring(0, exp + 1) : digits.PadRight(exp + 1, '0');
+                string frac = digits.Length > exp + 1 ? digits.Substring(exp + 1) : "0";
+                body = intPart + "." + frac;
+            }
+            else
+            {
+                body = "0." + new string('0', -exp - 1) + digits;
+            }
+            return (negative ? "-" : "") + body;
         }
 
         private static string Symbol(TokenType op)
