@@ -466,6 +466,34 @@ Recorrido completo, de lo que escribe el jugador a lo que se ve:
 5. **Circuito:** el solver nodal calcula la corriente por R1 y D1 (≈ 4,8 mA).
 6. **Pantalla:** `Led.Brightness` cambia, `LedView` recibe `StateChanged` y cambia el color del sprite.
 
+**Etapa E12 (24/11/2026):** modelo de la protoboard en el dominio (`Assets/Scripts/Domain/Wiring`).
+
+Decisiones tomadas con el alumno el 24/11/2026. Son decisiones del simulador, no datos de la placa del laboratorio, que no conocemos:
+
+- **Placa:** protoboard media, de 30 columnas, filas a–e y f–j y 4 raíles (T+, T−, B+, B−).
+- **Raíles:** continuos de punta a punta y sin tensión hasta que el jugador los cablea.
+- **Reglas de montaje:**
+  - una patilla por agujero;
+  - un cable por pin de la HAT;
+  - separación fija entre patillas según el tipo de componente: resistencia 4, LED 1, LDR 1, pulsador 2 y potenciómetro 1 + 1.
+- **Servo:** no se pincha en la protoboard; se enchufa a J7–J10 con sus cables.
+
+| Pieza | Detalle |
+|-------|---------|
+| `HoleId`, `BreadboardRow`, `Direction` | Un agujero es una fila (de 0 a 13 en la rejilla: raíles superiores, a–e, f–j, raíles inferiores) y una columna (1–30). Se escribe "a1"…"j30" o "T+5"/"B-12". `Move(dirección, pasos)` da el agujero a n pasos, como hará el A* |
+| `Breadboard : Component` | Cada tira (a–e o f–j de una columna) y cada raíl es **un único `Terminal`**, y sus agujeros son `Pin`es que comparten ese terminal, igual que los conectores de la HAT. Así una tira es un nodo ideal y no hace falta ninguna resistencia entre agujeros. Lleva la ocupación de cada agujero: la patilla o el cable que hay pinchado. Solo aporta al circuito las tiras con algo pinchado (`ConductorStrip`, un elemento que no estampa nada), de modo que una placa vacía no añade nodos al sistema |
+| `ComponentType.LeadSpacing` | La separación entre patillas es un dato del tipo, compartido por todas sus instancias (Flyweight). 0 significa que el componente no se pincha |
+| `Placement`, `Circuit.Place` | Recibe el componente, el agujero de la primera patilla y una dirección (→ ↓ ← ↑). Las demás patillas van en línea. La dirección fija la polaridad: un LED en c9 hacia → tiene el ánodo en c9 y el cátodo en c10. Si alguna patilla cae fuera o en un agujero ocupado, lanza `AssemblyException` sin cambiar nada |
+| `Wire`, `Circuit.AddWire` | Cable ideal entre agujeros, pines de la HAT ("J7.1", "J12.3"…) o patillas de componentes con cable propio (el servo). Se rechazan los pines de la Pi, que quedan bajo la HAT, y las patillas ya pinchadas. `RemoveWire` y `Remove(componente)` liberan lo ocupado |
+| `Circuit` | Por defecto (`WithImatHat`) incluye la protoboard. En `BuildNetlist`, cada patilla pinchada se une al terminal de su agujero y cada cable une sus dos extremos. La antigua `Connect` se mantiene como conexión directa sin reglas, para las pruebas de componentes sueltos |
+| Pruebas | 39 nuevas (`BreadboardTests`, 305 en total con `dotnet test`). Cubren las tiras y los raíles, los nombres, la colocación y su polaridad, las reglas y la liberación al quitar, además de cuatro montajes. **Reto 4** con 330 Ω: I = 1,3 V / 380 Ω ≈ 3,42 mA. **Reto 4 sin resistencia:** 26 mA, LED quemado y GPIO por encima de 7 mA. **Divisor de la LDR del reto 9** en CH0, a 10, 100 y 1000 lx: V = 3,3 · 10 k / (10 k + R_LDR). **El mismo divisor a 5 V:** sobretensión en el ADC. Una prueba más comprueba que cablear la masa con el programa en marcha enciende el LED sin reiniciar |
+
+**Aproximaciones:**
+
+- **Raíles:** cada raíl tiene un agujero por columna (30). Una placa real de 400 puntos tiene 25 por raíl, en grupos de 5. Así la rejilla del A* es regular.
+- **Distancias en la rejilla:** se cuentan en filas, sin tener en cuenta el canal central. Un LED de separación 1 puede cruzar de e a f.
+- **Cables y tiras:** son conductores ideales (0 Ω).
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |
