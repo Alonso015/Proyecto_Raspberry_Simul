@@ -429,6 +429,21 @@ atom       := NAME | NUMBER | STRING+ | True | False | None | '(' ... ')' | '[' 
 | `ScriptRuntime.Abort()` | Detiene el programa sin `KeyboardInterrupt` |
 | `RaspberryPi.Reset()` ya no desactiva el SPI | Es configuración de la Pi (`raspi-config`), no del programa |
 
+**Etapa E14 (24/11/2026):** primera escena de Unity (`Assets/Scenes/Main.unity`).
+
+| Pieza | Detalle |
+|-------|---------|
+| `ImatPiSim.Presentation` (asmdef) | Capa de presentación. Depende del dominio; el dominio no depende de ella |
+| `SimulationRunner` | Único `MonoBehaviour` dueño de la `SimulatorFacade`. En cada `Update()` hace `Tick(min(deltaTime, 0,1 s))`. El programa se edita en el Inspector (campo `program`; por defecto, "LED mientras pulso" del Tema 3) y arranca al darle a Play. Panel provisional con `OnGUI`: estado, tiempo, línea, botones Ejecutar / Parar / Reiniciar, errores, fallos y salida de `print` |
+| `BoardView` | Construye la HAT en código a partir del modelo: D1–D8 y SW1–SW4 con su GPIO (hardware.md §3.2 y §3.3) |
+| `LedView` | Observa al `Led` del dominio (`StateChanged`) y traduce el brillo a color. Normaliza al brillo de un LED de la HAT en continua (≈ 0,2), así que PWM al 25 % → un cuarto. Si está quemado: gris con "X" |
+| `ButtonView` | `OnMouseDown`/`OnMouseUp` sobre un `BoxCollider2D` (Input Manager clásico) → `PressButton`/`ReleaseButton` de la fachada; se redibuja al avisar el `PushButton` |
+| `SpriteFactory` | Sprites provisionales (cuadrado y círculo) generados en código, una vez, y compartidos entre todas las vistas. Textos con `TextMesh` y la fuente integrada |
+| `ImatPiSim.Editor` / `SceneBuilder` | Crea la escena desde el menú **IMAT Pi → Crear escena principal** o en batch (`-executeMethod ImatPiSim.EditorTools.SceneBuilder.BuildMainScene`), sin editar YAML a mano. Añade la escena a Build Settings |
+| `ImatPiSim.PlayMode.Tests` | 3 pruebas en modo Play: la escena dibuja 8 LED y 4 pulsadores y arranca; SW1 enciende y apaga D1; SW4 termina el programa |
+
+Las vistas no contienen lógica de simulación: leen el modelo y pasan las acciones a la fachada.
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |

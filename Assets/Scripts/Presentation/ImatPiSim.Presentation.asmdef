@@ -1,0 +1,16 @@
+{
+    "name": "ImatPiSim.Presentation",
+    "rootNamespace": "ImatPiSim.Presentation",
+    "references": [
+        "ImatPiSim.Domain"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
