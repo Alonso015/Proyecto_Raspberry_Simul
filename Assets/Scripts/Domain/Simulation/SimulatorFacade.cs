@@ -97,6 +97,9 @@ namespace ImatPiSim.Domain.Simulation
         /// <summary>Gira RV1: 0 = extremo de GND, 1 = extremo de 3,3 V.</summary>
         public void SetPotentiometer(double position) => Interact(() => Hat.Potentiometer.Position = position);
 
+        /// <summary>Cambia la luz que recibe una LDR (lx).</summary>
+        public void SetIlluminance(Ldr ldr, double lux) => Interact(() => ldr.Illuminance = lux);
+
         /// <summary>Activa o desactiva el SPI (como <c>raspi-config</c>); necesario para el MCP3008.</summary>
         public void SetSpiEnabled(bool enabled) => Interact(() => Pi.SpiEnabled = enabled);
 

@@ -213,6 +213,7 @@ Alternativas descartadas:
 | Alimentación mínima para que el servo se mueva | 4 V entre VCC y GND (E5, aceptado el 18/11/2026) | No está en las fuentes. Sin 5 V el servo no se mueve; no se modela su consumo |
 | Conversor MCP3008 | Ideal: código = ⌊1024·V/3,3⌋ en 0..1023, sin ruido ni offset; más de 3,4 V en un canal = daño (E5) | Fórmula de 10 bits sobre V_ref (F4, F5); el margen es el mismo supuesto que en los GPIO |
 | SPI0 al arrancar | Desactivado (E5) | Como en Raspberry Pi OS: la práctica 5 pide activarlo con `raspi-config` |
+| Cortocircuito a través de un componente | Más de **1 A** por un pulsador, potenciómetro, resistencia o LDR (E11, aceptado el 25/11/2026) | No está en las fuentes. Ninguna salida de la Pi ni de la HAT da tanto; los circuitos de los retos van en mA. Sin esta regla, un pulsador entre 3,3 V y GND (33 A con 0,1 Ω) no se detectaba: solo los cables directos entre raíles |
 
 ### 2.7 Representación visual
 
@@ -279,6 +280,40 @@ Condición de diseño: la representación visual queda separada de la lógica (�
 El orden coincide con la implementación por etapas: intérprete → solver y protoboard → ADC y PWM.
 
 **Mínimo jugable:** retos 1–5 más uno de los finales (8 o 9). Con eso el loop queda completo y demostrable aunque no dé tiempo a los 9.
+
+#### Cómo se comprueba cada reto
+
+**Decidido (25/11/2026, E11).**
+
+El botón **Comprobar** copia el montaje y el programa del jugador y los ejecuta aparte, en tiempo simulado: unos 20 s de reto tardan una fracción de segundo. Mientras tanto, el verificador da los estímulos y va comprobando.
+
+Reglas comunes a todos los retos:
+
+- **"Encendido"** es al menos el 50 % del brillo de un LED de la HAT en continua (unos 4 mA). **"Apagado"** es como mucho el 5 %.
+- Si hay un **error de sintaxis** o una pieza no permitida, el reto no se puede comprobar.
+- Si salta una **excepción de Python**, el reto no se supera.
+- Cualquier **fallo eléctrico** es una derrota, y el mensaje da su causa física.
+
+| # | Estímulos | Para ganar | Derrota propia |
+|---|-----------|------------|----------------|
+| 1 | — | D1 encendido y el resto apagados, a 1 s y a 3 s. El programa debe seguir vivo, por ejemplo con `pause()` | — |
+| 2 | SW4 se pulsa y se suelta dos veces | Los pares (D2, D4, D6, D8) encendidos **solo** mientras SW4 está pulsado; los impares, siempre apagados | — |
+| 3 | SW2: pulsación corta, larga (0,8 s) y corta | Los impares (D1, D3, D5, D7) se encienden, se apagan y se encienden | **Más de un cambio de GPIO20 en una pulsación** (leer `is_pressed` en bucle). Se cuentan los cambios reales de nivel del pin, aunque ocurran entre dos pasos |
+| 4 | — | Un LED externo encendido (≥ 1 mA), con la corriente saliendo de GPIO14 (≥ 90 % de la del LED) | LED quemado o GPIO > 7 mA |
+| 5 | El pulsador externo se pulsa dos veces | GPIO14 configurado como entrada; cada pulsación conmuta D1–D8 | Cortocircuito 3,3 V–GND (pulsador entre raíles) |
+| 6 | SW1 ×5, SW2 ×2, SW3, SW1 | D1–D8 muestran 5, 3, 0 y 1 en binario. **D1 = bit menos significativo** | Conflicto GPIO7/SPI si el SPI está activo |
+| 7 | RV1 al 0 %, 50 %, 100 % y 25 % | Barra desde D1 de redondeo(8 × nivel) LED, ±1. El SPI viene activado en este reto | — |
+| 8 | SW4 abre; SW4 cierra; SW4 abre y se deja | Abierta ≥ 120° y cerrada ≤ 60°, lo que cubre `min()`/`max()` de gpiozero (45°/135°). Tras la última apertura, sigue abierta a los 8 s y cerrada a los 11 s | **Tiempo**: no se cierra sola antes de 11 s |
+| 9 | Luz de la LDR: 10, 100 y 1000 lx | D1 con PWM: a oscuras ≥ 50 % y con mucha luz ≤ 35 %, y el brillo baja al subir la luz. El divisor va a **CH0 (J1.1)**; el SPI viene activado | Sobretensión en el ADC (divisor a 5 V) |
+
+**Piezas disponibles:**
+
+- Retos 1–3 y 6–8: ninguna. El servo del reto 8 viene ya enchufado a J7 y no se puede quitar.
+- Reto 4: resistencias y LED.
+- Reto 5: pulsador y resistencias.
+- Reto 9: LDR y resistencias.
+
+**Progreso:** el reto 1 empieza desbloqueado, y superar un reto desbloquea el siguiente.
 
 ---
 

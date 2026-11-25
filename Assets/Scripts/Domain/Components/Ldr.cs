@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using ImatPiSim.Domain.Electrical;
 
@@ -15,7 +16,7 @@ namespace ImatPiSim.Domain.Components
     /// garantiza "más de 0,5 MΩ", así que el valor concreto es un <b>supuesto</b>.</para>
     /// <para>Cada LDR real es distinta (a 10 lx, entre 3 y 20 kΩ); esta curva es la de un sensor.</para>
     /// </remarks>
-    public sealed class Ldr : ElectricalComponent
+    public sealed class Ldr : ElectricalComponent, IFaultSource
     {
         /// <summary>Curva de la práctica 5: (intensidad luminosa en lx, resistencia en Ω).</summary>
         private static readonly (double lux, double ohm)[] Curve =
@@ -82,5 +83,8 @@ namespace ImatPiSim.Domain.Components
 
         public override void OnSolved(ISolution solution) =>
             Current = (solution.VoltageAt(A.Node) - solution.VoltageAt(B.Node)) / Resistance;
+    
+        /// <summary>Más de 1 A por aquí es un cortocircuito entre raíles (<see cref="ElectricalLimits"/>).</summary>
+        public IEnumerable<Fault> CheckFaults() => ElectricalLimits.ShortThrough(Id, Current);
     }
 }

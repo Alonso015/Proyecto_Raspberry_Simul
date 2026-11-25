@@ -50,9 +50,9 @@ namespace ImatPiSim.Domain.Electrical
             get
             {
                 var c = CultureInfo.GetCultureInfo("es-ES");
-                string Fmt(double v) => Unit == "A"
-                    ? (v * 1000).ToString("0.##", c) + " mA"
-                    : v.ToString("0.##", c) + " V";
+                string Fmt(double v) => Unit != "A" ? v.ToString("0.##", c) + " V"
+                    : v >= 1 ? v.ToString("0.#", c) + " A"
+                    : (v * 1000).ToString("0.##", c) + " mA";
                 switch (Kind)
                 {
                     case FaultKind.LedOvercurrent:
@@ -62,7 +62,9 @@ namespace ImatPiSim.Domain.Electrical
                     case FaultKind.Overvoltage:
                         return $"{SourceId} dañado: {Fmt(Value)} en el pin (máx. {Fmt(Limit)}).";
                     case FaultKind.ShortCircuit:
-                        return $"Cortocircuito: {SourceId}.";
+                        return Unit == "A"
+                            ? $"Cortocircuito a través de {SourceId}: {Fmt(Value)} (más de {Fmt(Limit)})."
+                            : $"Cortocircuito: {SourceId}.";
                     case FaultKind.PinConflict:
                         return $"Conflicto de pines: {SourceId}.";
                     default:
@@ -72,6 +74,24 @@ namespace ImatPiSim.Domain.Electrical
         }
 
         public override string ToString() => Message;
+    }
+
+    /// <summary>Límites que no son de un componente concreto.</summary>
+    public static class ElectricalLimits
+    {
+        /// <summary>
+        /// Supuesto del simulador (decidido el 25/11/2026): más de 1 A por un componente pasivo
+        /// (pulsador, potenciómetro, resistencia, LDR) es un cortocircuito entre raíles a través de
+        /// él. Ninguna salida de la Pi o de la HAT da tanto; los circuitos de los retos van en mA.
+        /// </summary>
+        public const double ShortCircuitCurrent = 1.0;
+
+        /// <summary>El fallo de cortocircuito si <paramref name="current"/> supera el límite.</summary>
+        public static IEnumerable<Fault> ShortThrough(string id, double current)
+        {
+            if (Math.Abs(current) > ShortCircuitCurrent)
+                yield return new Fault(FaultKind.ShortCircuit, id, Math.Abs(current), ShortCircuitCurrent, "A");
+        }
     }
 
     /// <summary>Elemento que puede fallar según su último estado calculado.</summary>

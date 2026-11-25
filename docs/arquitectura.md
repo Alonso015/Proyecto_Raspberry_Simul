@@ -602,11 +602,49 @@ Las pruebas de modo Play comprueban:
 - bandas de color en las resistencias;
 - arte definitivo.
 
+**Etapa E11 (25/11/2026):** retos, verificador y máquina de estados del juego (`Assets/Scripts/Domain/Challenges`). Se han hecho **los 9 retos**, no solo los que no usan protoboard, porque la E12 ya está hecha. Los criterios aprobados están en requisitos.md §2.8.
+
+| Pieza | Detalle |
+|-------|---------|
+| `Challenge` | **Template Method.** `Verify(montaje, programa)` hace siempre lo mismo: comprueba que las piezas estén permitidas, reconstruye el montaje en un circuito nuevo, carga el programa (si hay error de sintaxis, el reto no se puede comprobar), lo ejecuta con el `Verifier` y convierte lo que pase en un `ChallengeResult`. Cada reto solo escribe su guion en `Script(v)`. Para el juego, todos los retos son intercambiables (Strategy). Datos de cada reto: número, título, enunciado, concepto, piezas disponibles, montaje de partida (`InitialAssembly`), piezas fijas y SPI de partida |
+| `Verifier` | Lo que puede usar un guion. **Tiempo:** `Run(s)` avanza en pasos de 10 ms y vigila en cada uno los fallos eléctricos y los errores del programa; si aparece uno, el reto termina ahí. **Estímulos:** `Click(pulsador)`, el potenciómetro y la luz de la LDR a través de la fachada. **Lecturas:** `LedLevel(n)` (brillo relativo al de un LED de la HAT encendido), `IsOn` e `IsOff`. **Comprobaciones:** `Expect` y `ExpectLeds`. Si una comprobación falla, el mensaje empieza por "No se cumple:"; si además el programa ya había terminado, sugiere que falta un bucle o `pause()`. Cada paso queda anotado en `Log` |
+| `ChallengeResult` / `ResultKind` | `Passed`, `CannotRun`, `ProgramError`, `ElectricalFault` (lleva el `Fault` con su causa física), `WrongBehaviour`, `MultipleToggles` (reto 3) y `TooSlow` (reto 8). Solo `Passed` es victoria. Incluye el mensaje, el instante simulado y el registro paso a paso |
+| `AssemblyPlan` | Describe el montaje: piezas con su tipo, parámetros, agujero y dirección; cables con su recorrido; y el SPI. `Capture(circuito)` lo describe y `Build()` lo reconstruye en un circuito nuevo con `ComponentFactory`. Se copia la descripción y no los objetos, para que un LED quemado o un pulsador pulsado no pasen a la prueba. Comprobar **no toca el circuito del jugador** (hay una prueba de ello) |
+| `Game` | **Patrón State.** Hay un objeto por pantalla: `MenuState`, `SelectionState`, `BuildingState`, `VictoryState` y `DefeatState` (los dos últimos comparten `ResultState`). Cada uno admite solo sus acciones (`Play`, `Choose`, `Check`, `Retry`, `Restart`, `Next`, `BackToSelection`, `BackToMenu`); cualquier otra lanza `InvalidOperationException` con el motivo. **Reinicio limpio:** entrar en un reto o reintentar crea un circuito y una fachada nuevos a partir de un `AssemblyPlan`, así que no queda estado eléctrico residual. Reintentar conserva el montaje y el programa; empezar de cero vuelve al montaje de partida. `ScreenChanged` avisa a la interfaz (Observer). Progreso: el reto 1 está libre y superar uno desbloquea el siguiente |
+| Cortocircuito a través de un componente | `ElectricalLimits.ShortThrough`: más de 1 A por un pulsador, potenciómetro, resistencia o LDR es un `ShortCircuit`, que ahora indica la corriente (por ejemplo, "Cortocircuito a través de SW5: 33 A (más de 1 A)"). El potenciómetro calcula la corriente de sus dos tramos de pista. Es un supuesto nuevo, anotado en requisitos.md §2.6 |
+| Otros | `Circuit.PinByName` acepta también las patillas de componentes con cable propio ("M1.SIG"), y `Circuit.NameOf` hace lo inverso. `SimulatorFacade.SetIlluminance(ldr, lux)` cambia la luz de una LDR |
+| Pruebas | 45 nuevas (371 en total). Ver la lista más abajo |
+
+Las pruebas comprueban:
+
+- **Soluciones de referencia y soluciones equivocadas.** Para cada reto, la de referencia gana y al menos una equivocada pierde por el motivo esperado:
+  - el reto 1 sin `pause()`;
+  - el reto 3 leyendo el nivel en un bucle: **MultipleToggles**, con D1 cambiando 3 veces en una pulsación;
+  - el reto 4 sin resistencia, o alimentado desde 3,3 V en lugar de GPIO14;
+  - el reto 5 con el pulsador entre los raíles: cortocircuito de 33 A;
+  - el reto 6 con el SPI activo: conflicto en GPIO7;
+  - el reto 7 sin SPI: `SPIError`;
+  - el reto 8 cerrándose a los 15 s (**TooSlow**) o a los 5 s;
+  - el reto 9 con el divisor a 5 V: sobretensión.
+- **Una segunda solución del reto 3** (detectar el flanco a mano) también gana.
+- **La máquina de estados:**
+  - acciones no válidas;
+  - bloqueo y desbloqueo de retos;
+  - victoria y pasar al siguiente;
+  - derrota;
+  - reintentar con un LED quemado (el nuevo LED sale sano y se conservan montaje y programa);
+  - empezar de cero;
+  - volver al menú y a la selección.
+- **La copia del montaje:** capturar y reconstruir dan el mismo montaje, incluidos el recorrido del A* y los parámetros.
+- **La regla del cortocircuito:** salta con un pulsador entre raíles y con un potenciómetro al extremo con el cursor a masa, y no con una resistencia normal.
+
+**Queda para la E17:** las pantallas de menú, selección, enunciado, victoria y derrota, conectadas a `Game`, y restringir la paleta a las piezas disponibles de cada reto.
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |
 |----------|----------|----------|
-| Datos de los retos | `ScriptableObject` editables en Unity, o archivos JSON | Retos, Factory |
+| ~~Datos de los retos~~ | **Decidido el 25/11/2026 (E11): clases C# en el dominio**, una por reto. La verificación es código, así que no cabe en un JSON ni en un `ScriptableObject`, y así se prueba sin Unity | Retos |
 
 ## 8. Estructura del repositorio y pruebas
 

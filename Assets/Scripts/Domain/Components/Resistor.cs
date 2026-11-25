@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using ImatPiSim.Domain.Electrical;
 
@@ -6,7 +7,7 @@ namespace ImatPiSim.Domain.Components
     /// <summary>
     /// Resistencia ideal (lineal): I = (Va − Vb) / R, en cualquier sentido.
     /// </summary>
-    public sealed class Resistor : ElectricalComponent
+    public sealed class Resistor : ElectricalComponent, IFaultSource
     {
         public Resistor(string id, double resistanceOhms) : base(id, ComponentTypes.Resistor)
         {
@@ -43,5 +44,8 @@ namespace ImatPiSim.Domain.Components
         }
 
         public override string ToString() => $"{Id} ({Resistance} Ω)";
+    
+        /// <summary>Más de 1 A por aquí es un cortocircuito entre raíles (<see cref="ElectricalLimits"/>).</summary>
+        public IEnumerable<Fault> CheckFaults() => ElectricalLimits.ShortThrough(Id, Current);
     }
 }

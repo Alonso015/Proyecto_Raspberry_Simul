@@ -269,7 +269,23 @@ namespace ImatPiSim.Domain.Simulation
             if (Breadboard != null && HoleId.TryParse(name, out var hole) && Breadboard.Contains(hole))
                 return Breadboard.Hole(hole);
             var pin = Hat?.Pins.FirstOrDefault(p => p.Name == name);
+            if (pin == null && name != null && name.Contains("."))
+            {
+                // Patilla de un componente externo con cable propio: "M1.SIG"
+                int dot = name.IndexOf('.');
+                var owner = _extras.FirstOrDefault(c => c.Id == name.Substring(0, dot));
+                pin = owner?.Pins.FirstOrDefault(p => p.Name == name.Substring(dot + 1));
+            }
             return pin ?? throw new AssemblyException($"No hay ningún punto de conexión llamado '{name}'.");
+        }
+
+        /// <summary>Nombre de un punto de conexión, el inverso de <see cref="PinByName"/>: "a10", "J7.1", "M1.SIG".</summary>
+        public string NameOf(Pin pin)
+        {
+            var hole = Breadboard?.HoleOf(pin);
+            if (hole.HasValue) return hole.Value.Name;
+            if (Hat != null && pin.Owner == Hat) return pin.Name;
+            return pin.FullName;
         }
 
         private void CheckWireEnd(Pin end)

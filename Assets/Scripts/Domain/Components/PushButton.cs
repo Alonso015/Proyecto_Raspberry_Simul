@@ -13,7 +13,7 @@ namespace ImatPiSim.Domain.Components
     /// Aproximación: no se simulan los rebotes mecánicos ni el condensador antirrebote de la
     /// IMAT HAT (C1–C4), que en continua es un circuito abierto (docs/arquitectura.md §6.3).
     /// </remarks>
-    public sealed class PushButton : ElectricalComponent
+    public sealed class PushButton : ElectricalComponent, IFaultSource
     {
         /// <summary>Supuesto: resistencia del contacto cerrado (Ω).</summary>
         public const double DefaultContactResistance = 0.1;
@@ -60,5 +60,8 @@ namespace ImatPiSim.Domain.Components
         }
 
         public override string ToString() => $"{Id} ({(IsPressed ? "pulsado" : "suelto")})";
+    
+        /// <summary>Más de 1 A por aquí es un cortocircuito entre raíles (<see cref="ElectricalLimits"/>).</summary>
+        public IEnumerable<Fault> CheckFaults() => ElectricalLimits.ShortThrough(Id, Current);
     }
 }

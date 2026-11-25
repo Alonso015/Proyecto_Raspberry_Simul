@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using ImatPiSim.Domain.Electrical;
 
@@ -13,7 +14,7 @@ namespace ImatPiSim.Domain.Components
     /// Aproximación: cada tramo tiene un mínimo de <see cref="MinTrackResistance"/> para que
     /// los extremos (p = 0 o 1) no sean un cortocircuito ideal.
     /// </remarks>
-    public sealed class Potentiometer : ElectricalComponent
+    public sealed class Potentiometer : ElectricalComponent, IFaultSource
     {
         /// <summary>Supuesto: resistencia mínima de cada tramo de la pista (Ω).</summary>
         public const double MinTrackResistance = 0.01;
@@ -61,6 +62,18 @@ namespace ImatPiSim.Domain.Components
             ctx.AddConductance(Wiper.Node, End3.Node, 1.0 / ResistanceToEnd3);
         }
 
-        public override void OnSolved(ISolution solution) => WiperVoltage = solution.VoltageAt(Wiper.Node);
+        public override void OnSolved(ISolution solution)
+        {
+            WiperVoltage = solution.VoltageAt(Wiper.Node);
+            double i1 = (solution.VoltageAt(End1.Node) - WiperVoltage) / ResistanceToEnd1;
+            double i3 = (WiperVoltage - solution.VoltageAt(End3.Node)) / ResistanceToEnd3;
+            MaxTrackCurrent = Math.Max(Math.Abs(i1), Math.Abs(i3));
+        }
+
+        /// <summary>Corriente del tramo de pista más cargado (A), tras la última resolución.</summary>
+        public double MaxTrackCurrent { get; private set; }
+
+        /// <summary>Más de 1 A por la pista es un cortocircuito (p. ej. mando a un extremo entre 3,3 V y GND).</summary>
+        public IEnumerable<Fault> CheckFaults() => ElectricalLimits.ShortThrough(Id, MaxTrackCurrent);
     }
 }
