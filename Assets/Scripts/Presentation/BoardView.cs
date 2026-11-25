@@ -22,9 +22,9 @@ namespace ImatPiSim.Presentation
         public static readonly Vector2 Centre = new Vector2(0, 4.3f);
 
         private static readonly Vector2 BoardSize = new Vector2(10.4f, 8.2f);
-        private const float PinPitch = 0.32f;
+        private const float PinPitch = 0.40f;
         private const float PinSize = 0.22f;
-        private const float GroupGap = 0.45f;
+        private const float GroupGap = 0.52f;
 
         private static readonly Color BoardColor = new Color(0.07f, 0.33f, 0.16f);
         private static readonly Color BoardEdge = new Color(0.04f, 0.20f, 0.10f);
@@ -120,9 +120,9 @@ namespace ImatPiSim.Presentation
                     var pin = hat.GetPin($"{name}.{i + 1}");
                     var local = new Vector2(x + i * PinPitch, y);
                     SpriteFactory.Shape(root, pin.Name, SpriteFactory.Square, local, Vector2.one * PinSize, PinColor(pin.Name), 3);
-                    string power = PowerLabel(pin.Name);
-                    if (power != null)
-                        SpriteFactory.Label(root, power, local + new Vector2(0, -0.27f), 0.14f, PinColor(pin.Name) == GndColor ? Silk : PinColor(pin.Name));
+                    var color = PinColor(pin.Name);
+                    SpriteFactory.Label(root, PinLabel(pin.Name), local + new Vector2(0, -0.27f), 0.13f,
+                                        color == GndColor || color == SignalColor ? Silk : color);
                     _connectorPins[pin] = root.TransformPoint(local);
                     _pinInfo[pin] = PinFunction(pin.Name);
                 }
@@ -182,6 +182,21 @@ namespace ImatPiSim.Presentation
         /// Rótulo corto de un pin de alimentación ("3V3", "5V", "GND"), o <c>null</c> si es una señal.
         /// Son los que da el esquema (J12, J2.1/J2.4, pines 2 y 3 de J7–J10): no se añade ninguno.
         /// </summary>
+        /// <summary>
+        /// Rótulo corto que se dibuja bajo cada pin: la alimentación ("3V3", "5V", "GND") o la señal
+        /// ("GP20", "SDA", "CH0"). Sale de la misma tabla que <see cref="Describe"/> (esquema rev. v1.1).
+        /// </summary>
+        public static string PinLabel(string pinName)
+        {
+            string power = PowerLabel(pinName);
+            if (power != null) return power;
+            string f = PinFunction(pinName);
+            if (f.Contains("SDA")) return "SDA";
+            if (f.Contains("SCL")) return "SCL";
+            if (f.StartsWith("CH")) return f.Substring(0, 3);
+            return "GP" + f.Substring(4, f.IndexOf(' ') - 4);   // "GPIO14 (...)" → "GP14"
+        }
+
         public static string PowerLabel(string pinName)
         {
             string f = PinFunction(pinName);

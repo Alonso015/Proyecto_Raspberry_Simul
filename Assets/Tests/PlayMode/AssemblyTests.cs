@@ -107,6 +107,20 @@ namespace ImatPiSim.PlayMode.Tests
         public void LosPinesDeAlimentacion_LlevanRotulo(string pin, string label) =>
             Assert.That(BoardView.PowerLabel(pin), Is.EqualTo(label));
 
+        [TestCase("J11.1", "GP20")]
+        [TestCase("J11.8", "GP27")]
+        [TestCase("J3.1", "GP7")]
+        [TestCase("J3.4", "GP19")]
+        [TestCase("J2.2", "SDA")]
+        [TestCase("J2.3", "SCL")]
+        [TestCase("J1.1", "CH0")]
+        [TestCase("J1.8", "CH7")]
+        [TestCase("J7.1", "GP14")]
+        [TestCase("J10.1", "GP23")]
+        [TestCase("J12.3", "3V3")]
+        public void CadaPin_LlevaSuRotulo(string pin, string label) =>
+            Assert.That(BoardView.PinLabel(pin), Is.EqualTo(label));
+
         [Test]
         public void ElRotulo_CorrespondeALaTensionReal()
         {
