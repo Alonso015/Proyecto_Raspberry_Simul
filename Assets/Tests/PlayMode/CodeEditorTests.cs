@@ -159,6 +159,70 @@ namespace ImatPiSim.PlayMode.Tests
         }
 
         [UnityTest]
+        public IEnumerator UnClicEnElEditor_LlegaAlCampoDeTexto()
+        {
+            // Lo que hace el ratón: el EventSystem lanza un rayo desde el punto de la pantalla y el
+            // clic va al primer gráfico que lo recibe (o a un padre suyo que lo gestione).
+            yield return null;
+            var rt = (RectTransform)_panel.Editor.Input.transform;
+            var centre = RectTransformUtility.WorldToScreenPoint(null, rt.TransformPoint(rt.rect.center));
+            var pointer = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current) { position = centre };
+            var hits = new System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+            UnityEngine.EventSystems.EventSystem.current.RaycastAll(pointer, hits);
+            Assert.That(hits, Is.Not.Empty);
+            var handler = UnityEngine.EventSystems.ExecuteEvents.GetEventHandler<UnityEngine.EventSystems.IPointerDownHandler>(hits[0].gameObject);
+            Assert.That(handler, Is.SameAs(_panel.Editor.Input.gameObject), "el clic lo recibe el campo de texto, no el panel");
+        }
+
+        [UnityTest]
+        public IEnumerator UnClicCompletoEnElEditor_LeDaElFoco()
+        {
+            yield return null;
+            var es = UnityEngine.EventSystems.EventSystem.current;
+            var rt = (RectTransform)_panel.Editor.Input.transform;
+            var centre = RectTransformUtility.WorldToScreenPoint(null, rt.TransformPoint(rt.rect.center));
+            var pointer = new UnityEngine.EventSystems.PointerEventData(es)
+            {
+                position = centre, button = UnityEngine.EventSystems.PointerEventData.InputButton.Left, clickCount = 1
+            };
+            var hits = new System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+            es.RaycastAll(pointer, hits);
+            Assume.That(hits, Is.Not.Empty);
+            pointer.pointerCurrentRaycast = pointer.pointerPressRaycast = hits[0];
+            var target = hits[0].gameObject;
+            TestContext.Out.WriteLine("el rayo da en: " + target.name);
+
+            // Lo mismo que hace el StandaloneInputModule al pulsar y soltar el botón del ratón
+            var down = UnityEngine.EventSystems.ExecuteEvents.ExecuteHierarchy(target, pointer, UnityEngine.EventSystems.ExecuteEvents.pointerDownHandler);
+            pointer.pointerPress = down;
+            yield return null;
+            UnityEngine.EventSystems.ExecuteEvents.Execute(down, pointer, UnityEngine.EventSystems.ExecuteEvents.pointerUpHandler);
+            UnityEngine.EventSystems.ExecuteEvents.Execute(down, pointer, UnityEngine.EventSystems.ExecuteEvents.pointerClickHandler);
+            yield return null;
+            yield return null;
+
+            Assert.That(down, Is.SameAs(_panel.Editor.Input.gameObject), "el clic lo gestiona el campo de texto");
+            Assert.That(es.currentSelectedGameObject, Is.SameAs(_panel.Editor.Input.gameObject), "el campo queda seleccionado");
+            Assert.That(_panel.Editor.Input.isFocused, Is.True, "y con el cursor activo para escribir");
+        }
+
+        [UnityTest]
+        public IEnumerator UnClicEnLosBotones_LlegaAlBoton()
+        {
+            yield return null;
+            foreach (var button in new[] { _panel.RunButton, _panel.StopButton, _panel.ResetButton })
+            {
+                var rt = (RectTransform)button.transform;
+                var centre = RectTransformUtility.WorldToScreenPoint(null, rt.TransformPoint(rt.rect.center));
+                var pointer = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current) { position = centre };
+                var hits = new System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+                UnityEngine.EventSystems.EventSystem.current.RaycastAll(pointer, hits);
+                var handler = UnityEngine.EventSystems.ExecuteEvents.GetEventHandler<UnityEngine.EventSystems.IPointerClickHandler>(hits[0].gameObject);
+                Assert.That(handler, Is.SameAs(button.gameObject), button.name);
+            }
+        }
+
+        [UnityTest]
         public IEnumerator LaPlaca_QuedaFueraDelPanel()
         {
             yield return null;

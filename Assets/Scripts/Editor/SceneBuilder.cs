@@ -1,5 +1,6 @@
 using System.Linq;
 using ImatPiSim.Presentation;
+using ImatPiSim.Presentation.Assembly;
 using ImatPiSim.Presentation.Ui;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -38,6 +39,9 @@ namespace ImatPiSim.EditorTools
             sim.AddComponent<SimulationRunner>();
             sim.AddComponent<BoardView>();
             sim.AddComponent<EditorPanel>();
+            sim.AddComponent<BreadboardView>();
+            sim.AddComponent<PaletteView>();
+            sim.AddComponent<AssemblyController>();
 
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             EditorSceneManager.SaveScene(scene, ScenePath);

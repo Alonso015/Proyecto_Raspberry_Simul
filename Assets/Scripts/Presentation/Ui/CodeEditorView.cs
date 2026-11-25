@@ -87,6 +87,10 @@ namespace ImatPiSim.Presentation.Ui
             // Campo de texto: GameObject con TMP_InputField → "Área de texto" (viewport con máscara) → marcas + texto
             var field = UiFactory.Rect(area, "Código", Vector2.zero, Vector2.one,
                                        new Vector2(GutterWidth, Padding), new Vector2(-Padding, -Padding));
+            // El campo necesita un gráfico propio que reciba los clics (raycast); si no, el clic se
+            // lo queda el fondo del panel y no se puede escribir ni seleccionar. Transparente: solo
+            // está para eso.
+            UiFactory.Background(field, Color.clear, raycastTarget: true);
             var viewport = UiFactory.Fill(field, "Área de texto");
             viewport.gameObject.AddComponent<RectMask2D>();
 
@@ -97,6 +101,11 @@ namespace ImatPiSim.Presentation.Ui
                                    TextAlignmentOptions.TopLeft, font);
             _text.richText = false;
 
+            // El campo se configura DESACTIVADO y se activa al final: TMP_InputField crea en su
+            // OnEnable el objeto "Caret", que dibuja el cursor y el resaltado de la selección, pero
+            // solo si ya tiene textComponent. Con AddComponent sobre un objeto activo, OnEnable
+            // se ejecuta antes de asignarlo y el campo se queda sin cursor ni selección visibles.
+            field.gameObject.SetActive(false);
             _input = field.gameObject.AddComponent<TMP_InputField>();
             _input.textViewport = viewport;
             _input.textComponent = _text;
@@ -107,13 +116,16 @@ namespace ImatPiSim.Presentation.Ui
             _input.scrollSensitivity = 20;
             _input.caretColor = Color.white;
             _input.customCaretColor = true;
-            _input.selectionColor = new Color(0.25f, 0.45f, 0.85f, 0.45f);
+            _input.caretWidth = 2;
+            _input.caretBlinkRate = 1f;
+            _input.selectionColor = new Color(0.30f, 0.50f, 0.95f, 0.55f);
             _input.onValueChanged.AddListener(OnValueChanged);
 
             // El campo activa el ajuste de línea al ponerlo multilínea: se quita después. Sin ajuste,
             // una línea larga hace scroll horizontal y cada línea del programa es una línea dibujada
             // (si no, los números y las marcas se desplazarían).
             _text.textWrappingMode = TextWrappingModes.NoWrap;
+            field.gameObject.SetActive(true);
         }
 
         private static RectTransform Mark(RectTransform parent, string name, Color color)

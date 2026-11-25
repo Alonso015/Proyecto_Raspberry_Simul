@@ -124,25 +124,61 @@ namespace ImatPiSim.Domain.Simulation
         public Placement Place(Component component, HoleId start, Direction direction)
         {
             if (component == null) throw new ArgumentNullException(nameof(component));
-            if (Breadboard == null) throw new AssemblyException("Este montaje no tiene protoboard.");
-            if (!component.Type.MountsOnBreadboard)
-                throw new AssemblyException($"{component.Type.DisplayName} no se pincha en la protoboard.");
             if (Components.Contains(component)) throw new AssemblyException($"{component.Id} ya está montado.");
+            if (!CanPlace(component.Type, start, direction, null, out string reason)) throw new AssemblyException(reason);
 
             var holes = Placement.HolesFor(component.Type, start, direction);
-            for (int i = 0; i < holes.Length; i++)
-            {
-                if (!Breadboard.Contains(holes[i]))
-                    throw new AssemblyException($"La patilla {component.Pins[i].Name} de {component.Id} quedaría fuera de la protoboard.");
-                var occupant = Breadboard.Occupant(holes[i]);
-                if (occupant != null)
-                    throw new AssemblyException($"El agujero {holes[i]} ya está ocupado por {Breadboard.Describe(occupant)}.");
-            }
-
             Add(component);
             for (int i = 0; i < holes.Length; i++) Breadboard.Occupy(holes[i], component.Pins[i]);
             var placement = new Placement(component, start, direction, holes);
             _placements.Add(placement);
+            return placement;
+        }
+
+        /// <summary>
+        /// Si un componente del tipo dado cabe en la protoboard empezando en <paramref name="start"/>
+        /// y en la dirección dada. No cambia nada: la interfaz lo usa para colorear la vista previa.
+        /// </summary>
+        /// <param name="ignore">Componente cuyos agujeros cuentan como libres (el que se está moviendo).</param>
+        /// <param name="reason">Por qué no cabe (para mostrarlo al jugador), o <c>null</c>.</param>
+        public bool CanPlace(ComponentType type, HoleId start, Direction direction, Component ignore, out string reason)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            reason = null;
+            if (Breadboard == null) reason = "Este montaje no tiene protoboard.";
+            else if (!type.MountsOnBreadboard) reason = $"{type.DisplayName} no se pincha en la protoboard.";
+            else
+            {
+                var holes = Placement.HolesFor(type, start, direction);
+                for (int i = 0; i < holes.Length && reason == null; i++)
+                {
+                    if (!Breadboard.Contains(holes[i]))
+                        reason = $"La patilla {type.PinNames[i]} de {type.DisplayName} quedaría fuera de la protoboard.";
+                    else
+                    {
+                        var occupant = Breadboard.Occupant(holes[i]);
+                        bool own = ignore != null && occupant is Pin pin && pin.Owner == ignore;
+                        if (occupant != null && !own)
+                            reason = $"El agujero {holes[i]} ya está ocupado por {Breadboard.Describe(occupant)}.";
+                    }
+                }
+            }
+            return reason == null;
+        }
+
+        /// <summary>Mueve (o gira) un componente pinchado a otra posición. Si no cabe, no cambia nada.</summary>
+        /// <exception cref="AssemblyException">El componente no está pinchado o no cabe en la nueva posición.</exception>
+        public Placement Move(Component component, HoleId start, Direction direction)
+        {
+            var old = PlacementOf(component) ?? throw new AssemblyException($"{component?.Id} no está pinchado en la protoboard.");
+            if (!CanPlace(component.Type, start, direction, component, out string reason)) throw new AssemblyException(reason);
+
+            foreach (var hole in old.Holes) Breadboard.Release(hole);
+            var holes = Placement.HolesFor(component.Type, start, direction);
+            for (int i = 0; i < holes.Length; i++) Breadboard.Occupy(holes[i], component.Pins[i]);
+            var placement = new Placement(component, start, direction, holes);
+            _placements[_placements.IndexOf(old)] = placement;
+            Version++;
             return placement;
         }
 

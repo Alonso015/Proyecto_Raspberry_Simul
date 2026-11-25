@@ -540,6 +540,68 @@ Resultados de las pruebas:
 - Los cables van por la rejilla en horizontal y vertical, nunca en diagonal.
 - Pasar por encima del cuerpo de un componente cuenta como un cruce.
 
+**Etapa E16 (24/11/2026):** protoboard visual y montaje con el ratón (`Assets/Scripts/Presentation/Assembly`).
+
+Decisiones tomadas con el alumno el 24/11/2026:
+
+- **Disposición:** la paleta va en una franja entre la HAT y la protoboard.
+- **Cables:** se tienden con clic en el origen y clic en el destino. Entre dos agujeros traza el A*; si un extremo está en la HAT, es un cable Dupont recto.
+- **Bloqueo:** el montaje queda bloqueado mientras el programa se ejecuta.
+- **Resistencias:** la paleta trae cuatro valores fijos: 220 Ω, 330 Ω, 1 kΩ y 10 kΩ.
+
+| Pieza | Detalle |
+|-------|---------|
+| Dominio | `Circuit.CanPlace(tipo, inicio, dirección, ignorar, out motivo)` comprueba si cabe sin cambiar nada; con él se colorea la vista previa. `Place` lo usa por dentro. `Circuit.Move` mueve o gira un componente: sus propios agujeros cuentan como libres y, si no cabe, no cambia nada. `SimulatorFacade.PressButton(PushButton)` pulsa también los pulsadores externos. +4 pruebas EditMode |
+| `BoardView` | La HAT crece a 10,4 × 8,2 para dibujar dos filas de conectores: J11, J3 y J2 en una; J1, J7–J10 y J12 en otra. Cada pin está coloreado según su función (GND, 5 V, 3,3 V o señal) y sabe a qué `Pin` del dominio corresponde. `ConnectorAt(mundo)` devuelve el pin bajo el ratón, y `Describe` su texto de ayuda (por ejemplo, "J7.1 · GPIO14 (servo 1, señal)") |
+| `BreadboardView` | Dibuja los 420 agujeros, los raíles (rojo + y azul −), el canal central, las letras de fila y los números de columna. **Del ratón a la rejilla:** la cámara pasa de píxeles a mundo con `ScreenToWorldPoint`; esta clase pasa de mundo a coordenadas locales y de ahí a la columna (redondeando x / paso) y a la fila (la `RowY` más cercana). Si el punto queda a más de medio paso de cualquier agujero, no devuelve ninguno. Es la inversa exacta de `HoleToWorld`, y una prueba lo comprueba en los 420 agujeros. Los huecos de los raíles y del canal solo afectan al dibujo, no a la rejilla del A* |
+| `PaletteView` / `PaletteItem` | Muestra 8 piezas: 4 resistencias, LED, pulsador, potenciómetro de 10 kΩ y LDR. Cada pieza es un tipo con sus parámetros; `ComponentFactory` la crea al soltarla (Factory) |
+| `ComponentArt` | Dibujo provisional de cada tipo, en horizontal y con las patillas en el eje x. Se gira según la dirección de la colocación. Lo comparten la paleta, la vista previa y los componentes ya colocados |
+| `PlacedComponentView` | Vista de un componente pinchado, con un `BoxCollider2D` para seleccionarlo. Para los LED y pulsadores externos reutiliza `LedView` y `ButtonView` (Observer). Al moverlo se crea una vista nueva, así que las suscripciones nunca se duplican |
+| `WireView` | `LineRenderer` que sigue el recorrido del A* o va en línea recta hasta la HAT, con un `EdgeCollider2D` para seleccionarlo |
+| `AssemblyController` | Traduce el ratón a operaciones del dominio. Sus estados son reposo, colocando, moviendo y cableando. Controles: arrastrar desde la paleta (R gira la pieza), arrastrar un componente para moverlo, clic + clic para un cable, clic derecho para borrar y Esc para cancelar. La vista previa pone en verde o rojo los agujeros que ocuparía. Abajo muestra una ayuda con lo que hay bajo el ratón (agujero y su tira, pin de la HAT con su función, componente) y los mensajes de error del dominio. Los métodos `TryPlace`, `TryMove`, `Delete` y `TryWire` son los mismos que usa el ratón, y las pruebas los llaman directamente. Lleva `[DefaultExecutionOrder(50)]`: arranca después de que la HAT dibuje sus conectores |
+| `ButtonView` | Ahora sirve para cualquier pulsador. Uno externo solo se pulsa con el programa en marcha; parado, el clic es para moverlo. La tapa se hunde en proporción a su tamaño |
+| `EditorPanel.FrameCamera` | Encuadra la unión de todas las `IWorkspaceArea` (HAT, paleta y protoboard) en el 60 % derecho de la pantalla |
+| Pruebas | 13 nuevas en modo Play (`AssemblyTests`); con los ajustes de abajo, 43 en total. Ver la lista más abajo |
+
+Las pruebas de modo Play comprueban:
+
+- **Ratón y escena:**
+  - del mundo a la rejilla y vuelta, en los 420 agujeros;
+  - la paleta y los conectores de la HAT;
+  - la HAT y la protoboard se ven enteras fuera del panel.
+- **Colocar y cambiar componentes:**
+  - una resistencia colocada en su sitio;
+  - agujero ocupado, con su motivo;
+  - mover, girar y quitar;
+  - montaje bloqueado con el programa en marcha.
+- **Cables:**
+  - un cable A* que rodea una resistencia;
+  - un cable Dupont recto, y uno solo por pin de la HAT.
+- **Retos y pulsadores:**
+  - el reto 4 montado en la escena enciende el LED externo (1,3 V / 380 Ω);
+  - sin resistencia, el LED se quema;
+  - un pulsador externo se pulsa con el programa en marcha.
+
+**Ajustes tras probarlo a mano (25/11/2026):**
+
+- **Pines de alimentación rotulados.** Debajo de cada pin de la HAT que da tensión aparece "3V3", "5V" o "GND": J12, J2.1/J2.4 y los pines 2 y 3 de J7–J10. No se añade ningún conector que no esté en el esquema. Hay pruebas de que cada rótulo coincide con el raíl real del circuito.
+- **El editor no recibía clics.** El `TMP_InputField` no tenía un gráfico propio (`raycastTarget`), así que el clic se lo quedaba el fondo del panel. Ahora tiene una `Image` transparente que lo recibe.
+- **No se veían el cursor ni la selección.** `TMP_InputField` crea en su `OnEnable` el objeto `Caret`, que los dibuja, pero solo si ya tiene `textComponent`. Con `AddComponent` sobre un objeto activo, `OnEnable` se ejecutaba antes de asignarlo. Ahora el campo se configura desactivado y se activa al final. El cursor pasa a 2 px.
+- **Pruebas con el ratón real** (`RealMouseTests`). Un `BaseInput` simulado sustituye al ratón dentro del `StandaloneInputModule`, de modo que los clics recorren el mismo camino que los del jugador. Comprueban:
+  - un clic en el editor le da el foco;
+  - existe el `Caret`;
+  - arrastrar selecciona texto;
+  - el botón Parar detiene el programa.
+
+  Las pruebas anteriores llamaban a los métodos directamente y por eso no detectaron estos fallos.
+- **Recomendación para el desarrollo:** *Edit → Preferences → General → Script Changes While Playing* = **Recompile After Finished Playing**. Si Unity recompila en Play, pierde la `SimulatorFacade` (que no se serializa) y lanza `NullReferenceException` en cada frame.
+
+**Pendiente para E19:**
+
+- cables con curva;
+- bandas de color en las resistencias;
+- arte definitivo.
+
 ## 7. Decisiones abiertas para la siguiente iteración
 
 | Decisión | Opciones | Afecta a |

@@ -89,6 +89,11 @@ namespace ImatPiSim.Domain.Simulation
 
         public bool IsButtonPressed(int n) => Hat.Button(n).IsPressed;
 
+        /// <summary>Pulsa un pulsador cualquiera (p. ej. uno externo pinchado en la protoboard).</summary>
+        public void PressButton(PushButton button) => Interact(button.Press);
+
+        public void ReleaseButton(PushButton button) => Interact(button.Release);
+
         /// <summary>Gira RV1: 0 = extremo de GND, 1 = extremo de 3,3 V.</summary>
         public void SetPotentiometer(double position) => Interact(() => Hat.Potentiometer.Position = position);
 

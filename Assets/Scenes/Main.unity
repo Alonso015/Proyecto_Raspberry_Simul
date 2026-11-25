@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &662092968
+--- !u!1 &683694861
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,8 +127,125 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 662092970}
-  - component: {fileID: 662092969}
+  - component: {fileID: 683694868}
+  - component: {fileID: 683694867}
+  - component: {fileID: 683694866}
+  - component: {fileID: 683694865}
+  - component: {fileID: 683694864}
+  - component: {fileID: 683694863}
+  - component: {fileID: 683694862}
+  m_Layer: 0
+  m_Name: Simulador
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &683694862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683694861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79e7129beb548a34ea47a2c8a117d4dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &683694863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683694861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84aef348423b42643910ac89f8087621, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &683694864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683694861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25ee6d9524b2f354eb29afc808b9f36d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &683694865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683694861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 344970571a4bac44d85a9495dd04f5cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &683694866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683694861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dd5e3fb1ad460644908f1a88722d47d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &683694867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683694861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cd0a640f3e50e44da32861678d2ec8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  program: "from gpiozero import LED, Button\n\n# Tema 3: el LED D1 (GPIO20) se enciende
+    mientras\n# se pulsa SW1 (GPIO7). SW4 (GPIO19) termina.\ndef main() -> None:\n   
+    puls_led = Button(7)\n    puls_fin = Button(19)\n    led_0 = LED(20)\n    while
+    True:\n        if puls_led.is_pressed:\n            led_0.on()\n        else:\n           
+    led_0.off()\n        if puls_fin.is_pressed:\n            print('Fin del programa')\n           
+    break\n\nif __name__ == \"__main__\":\n    try:\n        main()\n    except KeyboardInterrupt:\n       
+    print('Programa detenido')\n"
+  runOnStart: 1
+--- !u!4 &683694868
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683694861}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1459285033
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1459285035}
+  - component: {fileID: 1459285034}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -136,13 +253,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!20 &662092969
+--- !u!20 &1459285034
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 662092968}
+  m_GameObject: {fileID: 1459285033}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
@@ -187,94 +304,16 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!4 &662092970
+--- !u!4 &1459285035
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 662092968}
+  m_GameObject: {fileID: 1459285033}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2060928777
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2060928781}
-  - component: {fileID: 2060928780}
-  - component: {fileID: 2060928779}
-  - component: {fileID: 2060928778}
-  m_Layer: 0
-  m_Name: Simulador
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2060928778
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2060928777}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 344970571a4bac44d85a9495dd04f5cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2060928779
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2060928777}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7dd5e3fb1ad460644908f1a88722d47d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2060928780
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2060928777}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cd0a640f3e50e44da32861678d2ec8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  program: "from gpiozero import LED, Button\n\n# Tema 3: el LED D1 (GPIO20) se enciende
-    mientras\n# se pulsa SW1 (GPIO7). SW4 (GPIO19) termina.\ndef main() -> None:\n   
-    puls_led = Button(7)\n    puls_fin = Button(19)\n    led_0 = LED(20)\n    while
-    True:\n        if puls_led.is_pressed:\n            led_0.on()\n        else:\n           
-    led_0.off()\n        if puls_fin.is_pressed:\n            print('Fin del programa')\n           
-    break\n\nif __name__ == \"__main__\":\n    try:\n        main()\n    except KeyboardInterrupt:\n       
-    print('Programa detenido')\n"
-  runOnStart: 1
---- !u!4 &2060928781
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2060928777}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -284,5 +323,5 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 662092970}
-  - {fileID: 2060928781}
+  - {fileID: 1459285035}
+  - {fileID: 683694868}

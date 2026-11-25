@@ -127,16 +127,29 @@ namespace ImatPiSim.Presentation.Ui
         private readonly List<string> _errors = new List<string>();
         private readonly List<string> _warnings = new List<string>();
 
-        private void LateUpdate() => FrameCamera(Camera.main, GetComponent<BoardView>());
+        private void LateUpdate() => FrameCamera(Camera.main, WorkspaceBounds(gameObject));
+
+        /// <summary>Rectángulo que abarca todas las partes de la escena que deben verse (HAT, paleta, protoboard).</summary>
+        public static Rect WorkspaceBounds(GameObject root)
+        {
+            var areas = root.GetComponents<IWorkspaceArea>();
+            if (areas.Length == 0) return new Rect(-1, -1, 2, 2);
+            var r = areas[0].Bounds;
+            foreach (var a in areas)
+            {
+                var b = a.Bounds;
+                r = Rect.MinMaxRect(Mathf.Min(r.xMin, b.xMin), Mathf.Min(r.yMin, b.yMin), Mathf.Max(r.xMax, b.xMax), Mathf.Max(r.yMax, b.yMax));
+            }
+            return r;
+        }
 
         /// <summary>
         /// Coloca la cámara para que la placa quepa entera en la zona derecha de la pantalla (la que
         /// no tapa el panel), sea cual sea la relación de aspecto de la ventana.
         /// </summary>
-        public static void FrameCamera(Camera camera, BoardView board, float margin = 0.6f)
+        public static void FrameCamera(Camera camera, Rect b, float margin = 0.6f)
         {
-            if (camera == null || board == null || !camera.orthographic) return;
-            var b = board.Bounds;
+            if (camera == null || !camera.orthographic) return;
             float aspect = Mathf.Max(0.1f, camera.aspect);
             float free = 1 - WidthFraction;
             float size = Mathf.Max((b.height + 2 * margin) / 2, (b.width + 2 * margin) / (2 * aspect * free));

@@ -134,6 +134,60 @@ namespace ImatPiSim.Domain.Tests.Wiring
             c.Place(new Led("LED1"), "b5", Direction.Right);   // el agujero se puede volver a usar
         }
 
+        [Test]
+        public void CanPlace_DiceSiCabeSinCambiarNada()
+        {
+            var c = NewCircuit();
+            c.Place(new Resistor("R1", 330), "b5", Direction.Right);
+            int version = c.Version;
+
+            Assert.That(c.CanPlace(ComponentTypes.Led, HoleId.Parse("c5"), Direction.Right, null, out var ok), Is.True);
+            Assert.That(ok, Is.Null);
+            Assert.That(c.CanPlace(ComponentTypes.Led, HoleId.Parse("b8"), Direction.Right, null, out var why), Is.False);
+            Assert.That(why, Does.Contain("b9"));
+            Assert.That(c.CanPlace(ComponentTypes.Servo, HoleId.Parse("a1"), Direction.Right, null, out _), Is.False);
+            Assert.That(c.Version, Is.EqualTo(version));
+        }
+
+        [Test]
+        public void Mover_LiberaLosAgujerosViejosYOcupaLosNuevos()
+        {
+            var c = NewCircuit();
+            var r = new Resistor("R1", 330);
+            c.Place(r, "b5", Direction.Right);
+            var p = c.Move(r, HoleId.Parse("b7"), Direction.Right);   // se solapa con su posición anterior: vale
+            Assert.That(p.Holes.Select(h => h.Name), Is.EqualTo(new[] { "b7", "b11" }));
+            Assert.That(c.Breadboard.IsFree(HoleId.Parse("b5")), Is.True);
+            Assert.That(c.Placements, Has.Count.EqualTo(1));
+
+            c.Move(r, HoleId.Parse("b7"), Direction.Down);             // girar: b7 → f7
+            Assert.That(c.PlacementOf(r).Holes.Select(h => h.Name), Is.EqualTo(new[] { "b7", "f7" }));
+        }
+
+        [Test]
+        public void Mover_SiNoCabe_NoCambiaNada()
+        {
+            var c = NewCircuit();
+            var r = new Resistor("R1", 330);
+            c.Place(r, "b5", Direction.Right);
+            c.AddWire("J7.1", "b20");
+            Assert.Throws<AssemblyException>(() => c.Move(r, HoleId.Parse("b16"), Direction.Right));
+            Assert.That(c.PlacementOf(r).Holes.Select(h => h.Name), Is.EqualTo(new[] { "b5", "b9" }));
+            Assert.That(c.Breadboard.Occupant(HoleId.Parse("b5")), Is.SameAs(r.GetPin("A")));
+        }
+
+        [Test]
+        public void UnPulsadorExterno_SePulsaDesdeLaFachada()
+        {
+            var c = NewCircuit();
+            var sw = (PushButton)c.Place(new PushButton("SW5"), "e10", Direction.Right).Component;
+            var sim = new SimulatorFacade(c);
+            sim.PressButton(sw);
+            Assert.That(sw.IsPressed, Is.True);
+            sim.ReleaseButton(sw);
+            Assert.That(sw.IsPressed, Is.False);
+        }
+
         // ------------------------------------------------------------------ cables
 
         [Test]
